@@ -42,22 +42,22 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
     public View getView(int pos, View counterView, ViewGroup parent){
         View row = counterView;
         ViewHolder holder;
-        Log.v(TAG,"GridViewAdapter");
         if(row==null){
             LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
             holder = new ViewHolder();
-            holder.titleTextView = (TextView) row.findViewById(R.id.grid_item_title);
+            //holder.titleTextView = (TextView) row.findViewById(R.id.grid_item_title);
             holder.imageView = (ImageView) row.findViewById(R.id.grid_item_image);
             row.setTag(holder);
         } else
             holder = (ViewHolder)row.getTag();
 
         MovieModel item = mGridData.get(pos);
-        Log.v(TAG,"get view: "+item.getTitle());
-        //holder.titleTextView.setText(Html.fromHtml(item.getTitle()));
-
-        Picasso.with(mContext).load(item.getPosterUrl()).into(holder.imageView);
+        Picasso.with(mContext)
+                .load(item.getPosterUrl())
+                .placeholder(R.drawable.loading)
+                .error(R.drawable.imagenotfound)
+                .into(holder.imageView);
         return row;
     }
 

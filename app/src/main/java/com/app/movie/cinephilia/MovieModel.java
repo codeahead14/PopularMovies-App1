@@ -56,7 +56,8 @@ public class MovieModel implements Parcelable{
     }
 
     public String getReleaseDate(){
-        return releaseDate;
+        String[] formatDate = releaseDate.split("-");
+        return formatDate[2]+"-"+formatDate[1]+"-"+formatDate[0];  //System.out.format("%s-%s-%s",formatDate[0],formatDate[1],formatDate[2]).toString();
     }
 
     public String getSynopsis(){
@@ -64,8 +65,6 @@ public class MovieModel implements Parcelable{
     }
 
     public String getPosterUrl(){
-
-        Log.v("MovieModel","poster url: "+posterUrl);
         return posterUrl;
     }
 
@@ -98,11 +97,11 @@ public class MovieModel implements Parcelable{
     };
 
     public MovieModel(Parcel parcel){
+        this.id = parcel.readInt();
+        this.synopsis = parcel.readString();
+        this.posterUrl = parcel.readString();
         this.title = parcel.readString();
         this.userRating = parcel.readDouble();
         this.releaseDate = parcel.readString();
-        this.synopsis = parcel.readString();
-        this.posterUrl = parcel.readString();
-        this.id = parcel.readInt();
     }
 }

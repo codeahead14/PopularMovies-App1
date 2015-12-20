@@ -1,8 +1,11 @@
 package com.app.movie.cinephilia;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -61,12 +64,14 @@ public class GridViewFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        //MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.gridviewfragment, menu);
     }
 
     public void updateGrid(){
-        new FetchMovieTask().execute("45");
+        FetchMovieTask fetchMovieTask = new FetchMovieTask();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String order = sharedPreferences.getString("Sort",getString(R.string.pref_sort_order));
+        fetchMovieTask.execute(order, Integer.toString(5));
     }
 
     @Override
@@ -86,6 +91,8 @@ public class GridViewFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = (View) inflater.inflate(R.layout.fragment_main, container, false);
         GridView mGridView = (GridView) rootView.findViewById(R.id.gridview);
+
+        //mProgressBar = (ProgressBar)rootView.findViewById(R.id.progress_bar);
 
         mGridData = new ArrayList<>();
         mGridAdapter = new GridViewAdapter(getActivity(), R.layout.grid_item_layout, mGridData);
@@ -110,20 +117,37 @@ public class GridViewFragment extends Fragment {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String responseJSONStr = null;
+        private String sort_by = null;
+        private ProgressDialog progress;
+
+        @Override
+        protected void onPreExecute(){
+            progress = new ProgressDialog(getActivity());
+            progress.setMessage("Loading Data");
+            progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progress.setIndeterminate(true);
+            progress.show();
+        }
 
         @Override
         protected ArrayList<MovieModel> doInBackground(String... params) {
             try {
+                if(params[0].equals("Most Popular"))
+                    sort_by = "popularity.desc";
+                else if(params[0].equals("Highest Rated"))
+                    sort_by = "vote_average.asc";
+
                 Uri.Builder builder = new Uri.Builder();
                 builder.scheme("http")
                         .authority("api.themoviedb.org")
                         .appendPath("3")
                         .appendPath("discover")
                         .appendPath("movie")
-                        .appendQueryParameter("sort_by","popularity.desc")
-                        .appendQueryParameter("api_key","f7097986478ba5bd9b98f5167305fcbd");
+                        .appendQueryParameter("sort_by",sort_by)
+                        .appendQueryParameter("page",params[1])
+                        .appendQueryParameter("api_key", "f7097986478ba5bd9b98f5167305fcbd");
                 inp_url = builder.build().toString();
-                //Log.v(LOG_TAG2, "uri "+inp_url);
+                Log.v(LOG_TAG2, "uri " + inp_url);
 
                 URL url = new URL(inp_url);
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -154,7 +178,7 @@ public class GridViewFragment extends Fragment {
                 responseJSONStr = buffer.toString();
             } catch (IOException e) {
                 responseJSONStr = null;
-                Log.d(TAG, e.getLocalizedMessage());
+                Log.d(LOG_TAG2, e.getLocalizedMessage());
             } finally {
                 if (urlConnection != null) {
                     urlConnection.disconnect();
@@ -180,15 +204,14 @@ public class GridViewFragment extends Fragment {
         protected void onPostExecute(ArrayList<MovieModel> result){
             if(result != null){
                 mGridAdapter.clear();
-                //mForecastAdapter.addAll(strings);
                 for(MovieModel elem: result) {
                     mGridAdapter.add(elem);
-                    Log.v(LOG_TAG2, "String element: "+elem);
                 }
             }
-            //Log.v(LOG_TAG2, "data: "+mGridData.get(1).getTitle());
+            progress.dismiss();
         }
     }
+
 
     private ArrayList<MovieModel> parseResult(String result) throws JSONException {
         try {
@@ -197,7 +220,6 @@ public class GridViewFragment extends Fragment {
             ArrayList<MovieModel> items = new ArrayList<>();
             for (int i = 0; i < posts.length(); i++) {
                 JSONObject post = posts.getJSONObject(i);
-                //Log.v(TAG,"jsonobject:"+post.getString(POSTER_PATH_KEY));
                 MovieModel movie = new MovieModel(post.getString(ORIGINAL_TITLE_KEY),
                         post.getDouble(VOTE_AVERAGE_KEY),
                         post.getString(RELEASE_DATE_KEY),

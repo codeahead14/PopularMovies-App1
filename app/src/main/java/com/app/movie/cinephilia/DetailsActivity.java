@@ -32,30 +32,3 @@ public class DetailsActivity extends AppCompatActivity {
         }
     }
 }
-        /*ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();*/
-
-        // Using Parcelable to get parcel object
-       /* MovieModel movie = getIntent().getExtras().getParcelable("com.app.movie.cinephilia.MovieModel");
-
-        TextView titleTextView = (TextView)findViewById(R.id.text_view_title);
-        titleTextView.setText(movie.getTitle());
-
-        // Set poster
-        ImageView imageViewPoster = (ImageView)findViewById(R.id.image_view_poster);
-        Picasso.with(this).load(movie.getPosterUrl()).into(imageViewPoster);
-
-        // Set release date
-        TextView releaseDateTextView = (TextView)findViewById(R.id.text_view_release_date);
-        releaseDateTextView.setText(movie.getReleaseDate());
-
-        // Set user rating
-        TextView userRatingTextView = (TextView)findViewById(R.id.text_view_user_rating);
-        userRatingTextView.setText(movie.getUserRating() + "/10");
-
-        // Set synopsis
-        TextView viewSynopsisTextView = (TextView)findViewById(R.id.text_view_synopsis);
-        viewSynopsisTextView.setText(movie.getSynopsis());
-
-    }
-}*/

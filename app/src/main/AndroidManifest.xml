@@ -22,7 +22,8 @@
         <activity
             android:name=".DetailsActivity"
             android:label="@string/title_activity_detail"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.app.movie.cinephilia.MainActivity" />
@@ -30,7 +31,8 @@
         <activity
             android:name=".User_Settings"
             android:label="@string/title_user_settings"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.app.movie.cinephilia.MainActivity" />

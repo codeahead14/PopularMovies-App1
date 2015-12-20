@@ -39,11 +39,11 @@ public class DetailsActivityFragment extends Fragment {
 
             // Set release date
             TextView releaseDateTextView = (TextView)rootView.findViewById(R.id.text_view_release_date);
-            releaseDateTextView.setText(movie.releaseDate);
+            releaseDateTextView.setText(releaseDateTextView.getText().toString()+"-"+movie.getReleaseDate());
 
             // Set user rating
             TextView userRatingTextView = (TextView)rootView.findViewById(R.id.text_view_user_rating);
-            userRatingTextView.setText(movie.userRating + "/10");
+            userRatingTextView.setText(userRatingTextView.getText().toString()+": "+movie.userRating + "/10");
 
             // Set synopsis
             TextView viewSynopsisTextView = (TextView)rootView.findViewById(R.id.text_view_synopsis);
