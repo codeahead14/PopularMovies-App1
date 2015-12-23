@@ -37,6 +37,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.app.movie.cinephilia.MainActivity" />
         </activity>
+        <activity
+            android:name=".showImageActivity"
+            android:label="@string/title_user_settings"
+            android:parentActivityName=".DetailsActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.app.movie.cinephilia.DetailsActivity" />
+        </activity>
 
     </application>
 

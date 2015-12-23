@@ -46,7 +46,6 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
             LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
             holder = new ViewHolder();
-            //holder.titleTextView = (TextView) row.findViewById(R.id.grid_item_title);
             holder.imageView = (ImageView) row.findViewById(R.id.grid_item_image);
             row.setTag(holder);
         } else
@@ -62,7 +61,6 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
     }
 
     static class ViewHolder {
-        TextView titleTextView;
         ImageView imageView;
     }
 }

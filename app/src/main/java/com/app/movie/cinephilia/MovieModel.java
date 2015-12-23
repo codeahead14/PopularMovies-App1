@@ -9,27 +9,21 @@ import android.util.Log;
  * Created by GAURAV on 13-12-2015.
  */
 public class MovieModel implements Parcelable{
-    /*private String image;
+    private String image;
     private String title;
     private double userRating;
     private String releaseDate;
     private String synopsis;
     private String posterUrl;
-    private int id;*/
+    private String vote_count;
+    private int id;
 
-    String image;
-    String title;
-    double userRating;
-    String releaseDate;
-    String synopsis;
-    String posterUrl;
-    int id;
-
-    public MovieModel(String originalTitle, double userRating, String releaseDate, String plotSynopsis, String posterPath, int id) {
+    public MovieModel(String originalTitle, double userRating, String releaseDate, String plotSynopsis, String posterPath, String vote_count, int id) {
         this.title = originalTitle;
         this.userRating = userRating;
         this.releaseDate = releaseDate;
         this.synopsis = plotSynopsis;
+        this.vote_count = vote_count;
         this.id = id;
         this.posterUrl = "http://image.tmdb.org/t/p/w185" + posterPath;
     }
@@ -43,7 +37,6 @@ public class MovieModel implements Parcelable{
     }
 
     public String getTitle() {
-        Log.v("MoveModel","Title: "+title);
         return title;
     }
 
@@ -57,7 +50,7 @@ public class MovieModel implements Parcelable{
 
     public String getReleaseDate(){
         String[] formatDate = releaseDate.split("-");
-        return formatDate[2]+"-"+formatDate[1]+"-"+formatDate[0];  //System.out.format("%s-%s-%s",formatDate[0],formatDate[1],formatDate[2]).toString();
+        return formatDate[2]+"-"+formatDate[1]+"-"+formatDate[0];
     }
 
     public String getSynopsis(){
@@ -66,6 +59,10 @@ public class MovieModel implements Parcelable{
 
     public String getPosterUrl(){
         return posterUrl;
+    }
+
+    public String getVoteCount(){
+        return vote_count;
     }
 
     @Override
@@ -81,6 +78,7 @@ public class MovieModel implements Parcelable{
         dest.writeString(title);
         dest.writeDouble(userRating);
         dest.writeString(releaseDate);
+        dest.writeString(vote_count);
     }
 
     public static final Parcelable.Creator<MovieModel> CREATOR = new Parcelable.Creator<MovieModel>() {
@@ -103,5 +101,6 @@ public class MovieModel implements Parcelable{
         this.title = parcel.readString();
         this.userRating = parcel.readDouble();
         this.releaseDate = parcel.readString();
+        this.vote_count = parcel.readString();
     }
 }

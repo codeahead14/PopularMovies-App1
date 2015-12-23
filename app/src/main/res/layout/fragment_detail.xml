@@ -60,7 +60,6 @@
                         android:id="@+id/text_view_release_date"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Released-"
                         android:textSize="15dp"
                         android:paddingBottom="10dp"/>
 
@@ -68,7 +67,12 @@
                         android:id="@+id/text_view_user_rating"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="User Rating: "
+                        android:paddingBottom="10dp"/>
+
+                    <TextView
+                        android:id="@+id/text_view_vote_count"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:paddingBottom="10dp"/>
 
                 </LinearLayout>
@@ -87,4 +91,11 @@
         </LinearLayout>
 
     </ScrollView>
+
+    <ImageView
+        android:id="@+id/full_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:scaleType="fitCenter" />
 </LinearLayout>
