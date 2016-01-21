@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,8 +7,8 @@
 
     <GridView
         android:id="@+id/gridview"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:columnWidth="150dp"
         android:numColumns="@integer/grid_columns"
         android:verticalSpacing="0dp"
@@ -17,4 +17,4 @@
         android:gravity="center"
         android:clickable="true" />
 
-</RelativeLayout>
+</FrameLayout>

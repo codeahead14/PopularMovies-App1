@@ -1,5 +1,5 @@
 <resources>
-    <string name="api_key">REPLACE WITH API KEY</string>
+    <string name="api_key">f7097986478ba5bd9b98f5167305fcbd</string>
     <string name="app_name">CinePhilia</string>
     <string name="action_settings">Settings</string>
     <string name="refresh_button">Refresh</string>
