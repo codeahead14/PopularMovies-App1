@@ -18,4 +18,5 @@
         <item>"Highest Rated"</item>
     </string-array>
     <string name="pref_sort_order">"Most Popular"</string>
+    <string name="full_image_desc">This is full screen image of the movie </string>
 </resources>

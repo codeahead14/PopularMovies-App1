@@ -65,6 +65,10 @@ public class MovieModel implements Parcelable{
         return vote_count;
     }
 
+    public int getId(){
+        return id;
+    }
+
     @Override
     public int describeContents() {
         return 0;

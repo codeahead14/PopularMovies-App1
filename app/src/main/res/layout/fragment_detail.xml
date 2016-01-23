@@ -1,40 +1,43 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?><!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:showIn="@layout/activity_details_view"
-    tools:context="com.example.android.sunshine.app.DetailActivityFragment">
+    tools:context="com.example.android.sunshine.app.DetailActivityFragment"> -->
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-    <ScrollView
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/text_view_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#009688"
-                android:textColor="@android:color/white"
-                android:paddingTop="20dp"
+                android:background="#004d40"
                 android:paddingBottom="20dp"
                 android:paddingLeft="30dp"
                 android:paddingRight="20dp"
-                android:textSize="30dp"
-                android:text="Title"/>
+                android:paddingTop="20dp"
+                android:text="Title"
+                android:textColor="@android:color/white"
+                android:textSize="30dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingTop="10dp"
-                android:paddingBottom="15dp">
+                android:paddingBottom="15dp"
+                android:paddingTop="10dp">
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -45,35 +48,35 @@
                         android:id="@+id/image_view_poster"
                         android:layout_width="match_parent"
                         android:layout_height="175dp"
-                        android:scaleType="fitCenter"/>
+                        android:scaleType="fitCenter" />
 
                 </FrameLayout>
 
                 <LinearLayout
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:orientation="vertical"
                     android:paddingLeft="5dp">
 
                     <TextView
                         android:id="@+id/text_view_release_date"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="15dp"
-                        android:paddingBottom="10dp"/>
+                        android:paddingBottom="10dp"
+                        android:textSize="15dp" />
 
                     <TextView
                         android:id="@+id/text_view_user_rating"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingBottom="10dp"/>
+                        android:paddingBottom="10dp" />
 
                     <TextView
                         android:id="@+id/text_view_vote_count"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingBottom="10dp"/>
+                        android:paddingBottom="10dp" />
 
                 </LinearLayout>
 
@@ -83,19 +86,32 @@
                 android:id="@+id/text_view_synopsis"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="What it is about!!"
+                android:paddingBottom="20dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
-                android:paddingBottom="20dp"/>
+                android:text="What it is about!!" />
+
+
+            <ImageView
+                android:id="@+id/full_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:contentDescription="@string/full_image_desc"
+                android:scaleType="fitCenter" />
+
+            <TextView
+                android:id="@+id/review_head"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="REVIEWS"
+                android:textColor="@color/colorPrimaryDark" />
+
+            <include layout="@layout/review_list_layout" />
 
         </LinearLayout>
 
     </ScrollView>
+</android.support.v4.widget.NestedScrollView>
 
-    <ImageView
-        android:id="@+id/full_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:scaleType="fitCenter" />
-</LinearLayout>
+

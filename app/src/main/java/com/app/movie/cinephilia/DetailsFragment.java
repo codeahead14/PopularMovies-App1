@@ -1,22 +1,42 @@
 package com.app.movie.cinephilia;
 
+import android.database.DataSetObserver;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.app.movie.cinephilia.reviews.FetchReviewTask;
+import com.app.movie.cinephilia.reviews.MovieReviewModel;
+import com.app.movie.cinephilia.reviews.ReviewAdapter;
 import com.squareup.picasso.Picasso;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by GAURAV on 19-12-2015.
  */
 public class DetailsFragment extends Fragment {
     private static final String TAG = DetailsFragment.class.getSimpleName();
-    private ImageView imageView;
+    private boolean mHasData;
+    private Intent intent;
+    private MovieModel movie;
+    private ArrayList<MovieReviewModel> mReviewData;
+    private ReviewAdapter mReviewAdapter;
+
+    /** ListView for Reviews**/
+    ListView reviewList;
 
     public DetailsFragment() {
     }
@@ -24,16 +44,41 @@ public class DetailsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+
+        intent = getActivity().getIntent();
+        if(intent!=null && intent.hasExtra(Intent.EXTRA_TEXT)) {
+            mHasData = true;
+            // Using Parcelable to get parcel object
+            movie = intent.getExtras().getParcelable(Intent.EXTRA_TEXT);
+            // Initializing the ReviewAdapter over listview
+            mReviewData = new ArrayList<>();
+            mReviewAdapter = new ReviewAdapter(getActivity(), R.layout.list_item_review, mReviewData);
+            FetchReviewTask reviewTask = new FetchReviewTask(getActivity(),mReviewAdapter);
+            reviewTask.execute(Integer.toString(movie.getId()));
+            // Initializing the TrailerAdapter
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Intent intent = getActivity().getIntent();
         final View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-        if(intent!=null && intent.hasExtra(Intent.EXTRA_TEXT)){
-            // Using Parcelable to get parcel object
-            final MovieModel movie = intent.getExtras().getParcelable(Intent.EXTRA_TEXT);
+        if(mHasData){
+            /*reviewList = (ListView)rootView.findViewById(R.id.review_list);
+            reviewList.setAdapter(mReviewAdapter);
+            mReviewAdapter.registerDataSetObserver(new DataSetObserver() {
+                @Override
+                public void onChanged() {
+                    super.onChanged();
+                    Utility.setListViewHeightBasedOnChildren(reviewList);
+                }
+            });*/
+
+            LinearLayout linearlayout = (LinearLayout)rootView.findViewById(R.id.review_list);
+            ListAdapter adapter = mReviewAdapter;
+            for(int iter=0; iter<adapter.getCount();iter++){
+                linearlayout.addView(adapter.getView(iter, null, null));
+            }
 
             TextView titleTextView = (TextView)rootView.findViewById(R.id.text_view_title);
             titleTextView.setText(movie.getTitle());
