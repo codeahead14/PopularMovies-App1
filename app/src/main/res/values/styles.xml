@@ -5,12 +5,12 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
         <item name="toolbarStyle">@style/Toolbar</item>
     </style>
 
     <!-- Main Activity Toolbar style -->
     <style name="Toolbar" parent="Widget.AppCompat.Toolbar">
-        <item name="android:background">?attr/colorPrimary</item>
         <item name="popupTheme">@style/Theme.AppCompat.Light</item>
     </style>
 
@@ -28,5 +28,12 @@
         <item name="displayOptions">useLogo|showHome</item>
         <item name="logo">@drawable/ic_launcher</item>
     </style>
+
+    <style name="TitleAppearance">
+        <item name="android:typeface">sans</item>
+        <item name="android:textSize">@dimen/title_size</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
 
 </resources>

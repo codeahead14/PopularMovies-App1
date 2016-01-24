@@ -40,6 +40,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
     public static final String OVERVIEW_KEY = "overview";
     public static final String POSTER_PATH_KEY = "poster_path";
     public static final String VOTE_COUNT = "vote_count";
+    public static final String BACKDROP_PATH_KEY = "backdrop_path";
     public static final String PAGE_NUMBER_KEY = "page";
     public static final String RESULTS_kEY = "results";
     public static final String ID = "id";
@@ -68,6 +69,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
             inp_url = builder.build().toString();
 
             URL url = new URL(inp_url);
+            Log.v(LOG_TAG2,"url: "+url.toString());
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
@@ -163,6 +165,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
                         post.getString(OVERVIEW_KEY),
                         post.getString(POSTER_PATH_KEY),
                         post.getString(VOTE_COUNT),
+                        post.getString(BACKDROP_PATH_KEY),
                         post.getInt(ID));
                 items.add(movie);
             }

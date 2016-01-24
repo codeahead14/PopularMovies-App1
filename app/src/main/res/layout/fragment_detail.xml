@@ -5,113 +5,119 @@
     android:orientation="vertical"
     tools:showIn="@layout/activity_details_view"
     tools:context="com.example.android.sunshine.app.DetailActivityFragment"> -->
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!--<TextView
+            android:id="@+id/text_view_title"
+            style="@style/TitleAppearance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/title_bottom_margin"
+            android:paddingLeft="@dimen/title_left_margin"
+            android:paddingStart="@dimen/title_left_margin"
+            android:paddingRight="@dimen/title_right_margin"
+            android:paddingEnd="@dimen/title_right_margin"
+            android:paddingTop="@dimen/title_top_margin"/>-->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/text_view_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#004d40"
-                android:paddingBottom="20dp"
-                android:paddingLeft="30dp"
-                android:paddingRight="20dp"
-                android:paddingTop="20dp"
-                android:text="Title"
-                android:textColor="@android:color/white"
-                android:textSize="30dp" />
+            android:orientation="horizontal"
+            android:paddingBottom="15dp"
+            android:paddingTop="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingBottom="15dp"
-                android:paddingTop="10dp">
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_weight="1">
 
-                <FrameLayout
+                <ImageView
+                    android:id="@+id/image_view_poster"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <ImageView
-                        android:id="@+id/image_view_poster"
-                        android:layout_width="match_parent"
-                        android:layout_height="175dp"
-                        android:scaleType="fitCenter" />
-
-                </FrameLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:paddingLeft="5dp">
-
-                    <TextView
-                        android:id="@+id/text_view_release_date"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="10dp"
-                        android:textSize="15dp" />
-
-                    <TextView
-                        android:id="@+id/text_view_user_rating"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="10dp" />
-
-                    <TextView
-                        android:id="@+id/text_view_vote_count"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="10dp" />
-
-                </LinearLayout>
+                    android:layout_height="200dp"
+                    android:scaleType="fitCenter" />
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/text_view_synopsis"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="20dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:text="What it is about!!" />
-
-
-            <ImageView
-                android:id="@+id/full_image"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:contentDescription="@string/full_image_desc"
-                android:scaleType="fitCenter" />
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/review_head"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="REVIEWS"
-                android:textColor="@color/colorPrimaryDark" />
+                <TextView
+                    android:id="@+id/text_view_title"
+                    style="@style/TitleAppearance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/margin_default"
+                    android:paddingRight="@dimen/margin_default"
+                    android:paddingEnd="@dimen/margin_default"
+                    android:paddingTop="@dimen/margin_default"/>
 
-            <include layout="@layout/review_list_layout" />
+                <TextView
+                    android:id="@+id/text_view_user_rating"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/info_textSize"
+                    android:paddingBottom="@dimen/margin_inline" />
+
+                <TextView
+                    android:id="@+id/text_view_release_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/margin_inline"
+                    android:textSize="@dimen/content_textSize" />
+
+                <TextView
+                    android:id="@+id/text_view_vote_count"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="10dp"
+                    android:textSize="@dimen/content_textSize"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
-    </ScrollView>
-</android.support.v4.widget.NestedScrollView>
+        <TextView
+            android:id="@+id/text_view_synopsis"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="20dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="What it is about!!" />
+
+
+        <ImageView
+            android:id="@+id/full_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:contentDescription="@string/full_image_desc"
+            android:scaleType="fitCenter" />
+
+        <TextView
+            android:id="@+id/review_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="REVIEWS"
+            android:textColor="@color/colorPrimaryDark" />
+
+        <!--<include layout="@layout/review_list_layout" />-->
+        <LinearLayout
+            android:id="@+id/review_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+
+    </LinearLayout>
 
 

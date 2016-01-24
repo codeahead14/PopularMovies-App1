@@ -18,9 +18,9 @@ import java.util.ArrayList;
 public class ReviewAdapter extends ArrayAdapter<MovieReviewModel> {
     private ArrayList<MovieReviewModel> mReviewData = new ArrayList<>();
 
-    private static class ViewHolder{
-        TextView author;
-        TextView content;
+    public static class ViewHolder{
+        public TextView author;
+        public TextView content;
     }
 
     public ReviewAdapter(Context context, int layoutResourceId, ArrayList<MovieReviewModel> reviews){

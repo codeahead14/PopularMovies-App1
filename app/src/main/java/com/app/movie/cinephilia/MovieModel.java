@@ -16,14 +16,17 @@ public class MovieModel implements Parcelable{
     private String synopsis;
     private String posterUrl;
     private String vote_count;
+    private String backdropUrl;
     private int id;
 
-    public MovieModel(String originalTitle, double userRating, String releaseDate, String plotSynopsis, String posterPath, String vote_count, int id) {
+    public MovieModel(String originalTitle, double userRating, String releaseDate, String plotSynopsis,
+                      String posterPath, String vote_count, String backdropPath, int id) {
         this.title = originalTitle;
         this.userRating = userRating;
         this.releaseDate = releaseDate;
         this.synopsis = plotSynopsis;
         this.vote_count = vote_count;
+        this.backdropUrl = "http://image.tmdb.org/t/p/w185" + backdropPath;
         this.id = id;
         this.posterUrl = "http://image.tmdb.org/t/p/w185" + posterPath;
     }
@@ -61,6 +64,10 @@ public class MovieModel implements Parcelable{
         return posterUrl;
     }
 
+    public String getBackdropUrl(){
+        return backdropUrl;
+    }
+
     public String getVoteCount(){
         return vote_count;
     }
@@ -83,6 +90,7 @@ public class MovieModel implements Parcelable{
         dest.writeDouble(userRating);
         dest.writeString(releaseDate);
         dest.writeString(vote_count);
+        dest.writeString(backdropUrl);
     }
 
     public static final Parcelable.Creator<MovieModel> CREATOR = new Parcelable.Creator<MovieModel>() {
@@ -106,5 +114,6 @@ public class MovieModel implements Parcelable{
         this.userRating = parcel.readDouble();
         this.releaseDate = parcel.readString();
         this.vote_count = parcel.readString();
+        this.backdropUrl = parcel.readString();
     }
 }

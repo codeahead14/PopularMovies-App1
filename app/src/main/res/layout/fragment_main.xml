@@ -3,6 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingTop="@dimen/frag_top_margin"
+    android:paddingBottom="@dimen/frag_top_margin"
+    android:paddingStart="@dimen/frag_left_margin"
+    android:paddingEnd="@dimen/frag_right_margin"
+    android:paddingLeft="@dimen/frag_left_margin"
+    android:paddingRight="@dimen/frag_right_margin"
     tools:context=".GridViewFragment">
 
     <GridView
@@ -11,8 +17,8 @@
         android:layout_height="match_parent"
         android:columnWidth="150dp"
         android:numColumns="@integer/grid_columns"
-        android:verticalSpacing="0dp"
-        android:horizontalSpacing="0dp"
+        android:verticalSpacing="3dp"
+        android:horizontalSpacing="3dp"
         android:stretchMode="columnWidth"
         android:gravity="center"
         android:clickable="true" />

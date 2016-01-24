@@ -4,12 +4,18 @@ package com.app.movie.cinephilia.reviews;
  * Created by GAURAV on 22-01-2016.
  */
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.app.movie.cinephilia.DataBus.AsyncTaskResultEvent;
+import com.app.movie.cinephilia.DataBus.BusProvider;
+import com.app.movie.cinephilia.DetailsFragment;
+import com.app.movie.cinephilia.OnReviewDataFetchFinished;
 import com.app.movie.cinephilia.R;
 
 import org.json.JSONArray;
@@ -24,18 +30,20 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class FetchReviewTask extends AsyncTask<String, Void, ArrayList<MovieReviewModel>> {
+public class FetchReviewTask extends AsyncTask<String, Void, ArrayList<MovieReviewModel>>{
 
-    Context mContext;
+    Activity mContext;
     ReviewAdapter mReviewsAdapter;
+    OnReviewDataFetchFinished onReviewDataFetchFinished;
     private ProgressDialog progress;
 
     private final String LOG_TAG = FetchReviewTask.class.getSimpleName();
 
 
-    public FetchReviewTask(Context context, ReviewAdapter adapter){
-        mContext = context;
-        mReviewsAdapter = adapter;
+    public FetchReviewTask(Activity context, ReviewAdapter adapter){ //, OnReviewDataFetchFinished onReviewDataFetchFinished){
+        this.mContext = context;
+        this.mReviewsAdapter = adapter;
+        //this.onReviewDataFetchFinished = onReviewDataFetchFinished;
     }
 
     @Override
@@ -187,6 +195,8 @@ public class FetchReviewTask extends AsyncTask<String, Void, ArrayList<MovieRevi
                 mReviewsAdapter.add(elem);
             }
         }
+        //onReviewDataFetchFinished.reviewDataFetchFinished(true);
+        BusProvider.getInstance().post(new AsyncTaskResultEvent(true));
         mReviewsAdapter.notifyDataSetChanged();
         progress.dismiss();
     }
