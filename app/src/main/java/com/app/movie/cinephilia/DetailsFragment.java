@@ -1,34 +1,37 @@
 package com.app.movie.cinephilia;
 
 import android.app.Activity;
-import android.database.DataSetObserver;
-import android.media.Image;
-import android.os.Parcelable;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.app.movie.cinephilia.DataBus.AsyncTaskResultEvent;
 import com.app.movie.cinephilia.DataBus.BusProvider;
+import com.app.movie.cinephilia.MovieDBAPIs.MovieContract;
+import com.app.movie.cinephilia.MovieDBAPIs.MovieContract.FavoriteMoviesEntry;
 import com.app.movie.cinephilia.reviews.FetchReviewTask;
 import com.app.movie.cinephilia.reviews.MovieReviewModel;
 import com.app.movie.cinephilia.reviews.ReviewAdapter;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by GAURAV on 19-12-2015.
@@ -40,19 +43,30 @@ public class DetailsFragment extends Fragment {
     private MovieModel movie;
     private ArrayList<MovieReviewModel> mReviewData;
     private ReviewAdapter mReviewAdapter;
-    private static boolean mReviewDataTaskOver;
-    //private RelativeLayout mRelativeLayout;
     private LinearLayout mLinearLayout;
     private UpdateToolBarWidget mDetailsActivityCallback;
-    /** ListView for Reviews**/
-    ListView reviewList;
+    private static Toolbar toolbar;
+    private static CollapsingToolbarLayout collapsingToolbar;
+    private static FloatingActionButton fab;
+    private ImageView imageView;
+
+    private ContentResolver resolver;
+
+    private static final String ARG_MOVIE = "movieFragment";
 
     public interface UpdateToolBarWidget{
         public void setTitleandBackDrop(String title, String backDropPath);
     }
 
-
     public DetailsFragment() {
+    }
+
+    public static DetailsFragment newInstance(MovieModel movie) {
+        DetailsFragment fragment = new DetailsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ARG_MOVIE, movie);
+        fragment.setArguments(bundle);
+        return fragment;
     }
 
     @Override
@@ -80,14 +94,7 @@ public class DetailsFragment extends Fragment {
             mReviewData = new ArrayList<>();
             mReviewAdapter = new ReviewAdapter(getActivity(), R.layout.list_item_review, mReviewData);
             FetchReviewTask reviewTask = new FetchReviewTask(getActivity(), mReviewAdapter);
-            /*FetchReviewTask reviewTask = new FetchReviewTask(getActivity(), mReviewAdapter, new OnReviewDataFetchFinished() {
-                @Override
-                public void reviewDataFetchFinished(boolean taskFinished) {
-                    mReviewDataTaskOver = taskFinished;
-                }
-            });*/
             reviewTask.execute(Integer.toString(movie.getId()));
-            // Initializing the TrailerAdapter
         }
     }
 
@@ -103,32 +110,72 @@ public class DetailsFragment extends Fragment {
         BusProvider.getInstance().unregister(this);
     }
 
+    public boolean isFavourtie(int movieId){
+        resolver = getContext().getContentResolver();
+        Cursor movieCursor = resolver.query(MovieContract.FavoriteMoviesEntry.
+                buildFavouriteMoviesUriWithMovieId(movieId),null,null,null,null);
+        if(movieCursor.getCount()==0)
+            return false;
+        else
+            return true;
+    }
+
+    public void updateDatabase(boolean isFavourite, int movieId, View view){
+        if(isFavourite){
+            /* Movie already in Favourites - Delete the movie from DB*/
+            resolver.delete(MovieContract.FavoriteMoviesEntry.
+                    buildFavouriteMoviesUriWithMovieId(movieId), null, null);
+            //Toast.makeText(getContext(), "REMOVED FROM FAVOURITES!", Toast.LENGTH_SHORT).show();
+            Snackbar.make(view, "REMOVED FROM FAVOURITES!", Snackbar.LENGTH_SHORT)
+                    .setAction("Action", null).show();
+            fab.setImageResource(R.drawable.ic_favorite_border_white_24dp);
+        }else{
+            /*Add values into DB*/
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(FavoriteMoviesEntry.COLUMN_MOVIE_ID,movie.getId());
+            contentValues.put(FavoriteMoviesEntry.COLUMN_ORIGINAL_TITLE,movie.getTitle());
+            contentValues.put(FavoriteMoviesEntry.COLUMN_RELEASE_DATE,movie.getReleaseDate());
+            contentValues.put(FavoriteMoviesEntry.COLUMN_OVERVIEW,movie.getSynopsis());
+            contentValues.put(FavoriteMoviesEntry.COLUMN_VOTE_AVG,movie.getUserRating());
+            contentValues.put(FavoriteMoviesEntry.COLUMN_VOTE_COUNT,movie.getVoteCount());
+            contentValues.put(FavoriteMoviesEntry.COLUMN_POSTER_URL,movie.getPosterUrl());
+            contentValues.put(FavoriteMoviesEntry.COLUMN_BACKDROP_URL, movie.getBackdropUrl());
+
+            resolver.insert(FavoriteMoviesEntry.CONTENT_URI, contentValues);
+
+            //Toast.makeText(getContext(), "ADDED TO FAVOURITES!", Toast.LENGTH_SHORT).show();
+
+            Snackbar.make(view, "ADDED TO FAVOURITES!", Snackbar.LENGTH_SHORT)
+                    .setAction("Action", null).show();
+            fab.setImageResource(R.drawable.ic_favorite_white_24dp);
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-        if(mHasData){
-            mDetailsActivityCallback.setTitleandBackDrop(movie.getTitle(),movie.getBackdropUrl());
-            Log.v(TAG,"All true");
-            /*reviewList = (ListView)rootView.findViewById(R.id.review_list);
-            Utility.setListViewHeightBasedOnChildren(reviewList);
-            //reviewList.addHeaderView(rootView,null,false);
-            reviewList.setAdapter(mReviewAdapter);
-            mReviewAdapter.registerDataSetObserver(new DataSetObserver() {
-                @Override
-                public void onChanged() {
-                    super.onChanged();
-                    //Utility.setListViewHeightBasedOnChildren(reviewList);
-                }
-            });*/
+        final View rootView = inflater.inflate(R.layout.fragment_detail_layout, container, false);
+        setupWidgets(rootView);
 
-            //mRelativeLayout = (RelativeLayout)rootView.findViewById(R.id.review_list);
+        fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+
+        if(mHasData){
+            mDetailsActivityCallback.setTitleandBackDrop(movie.getTitle(), movie.getBackdropUrl());
             mLinearLayout = (LinearLayout)rootView.findViewById(R.id.review_list);
-            //ListAdapter adapter = mReviewAdapter;
-            /*for(int iter=0; iter<mReviewAdapter.getCount();iter++){
-                View item = mReviewAdapter.getView(iter,null,null);
-                linearlayout.addView(item);
-            }*/
+
+            if(isFavourtie(movie.getId()))
+                fab.setImageResource(R.drawable.ic_favorite_white_24dp);
+            else
+                fab.setImageResource(R.drawable.ic_favorite_border_white_24dp);
+
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    isFavourtie(movie.getId());
+                    updateDatabase(isFavourtie(movie.getId()), movie.getId(), view);
+                }
+            });
+
 
             TextView titleTextView = (TextView)rootView.findViewById(R.id.text_view_title);
             titleTextView.setText(movie.getTitle());
@@ -159,10 +206,21 @@ public class DetailsFragment extends Fragment {
 
             // Set Vote Count
             TextView voteCountTextView = (TextView)rootView.findViewById(R.id.text_view_vote_count);
-            voteCountTextView.setText(getString(R.string.voteCount)+": "+ movie.getVoteCount());
+            voteCountTextView.setText(getString(R.string.voteCount) + ": " + movie.getVoteCount());
+
+            collapsingToolbar.setTitle(movie.getTitle());
+            imageView = (ImageView) rootView.findViewById(R.id.backdrop);
+            Picasso.with(getActivity()).load(movie.getBackdropUrl()).into(imageView);
 
         }
         return rootView;
+    }
+
+    private void setupWidgets(View rootView) {
+        toolbar = (Toolbar)rootView.findViewById(R.id.detailstoolbar);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        collapsingToolbar = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsing_toolbar);
     }
 
     @Subscribe

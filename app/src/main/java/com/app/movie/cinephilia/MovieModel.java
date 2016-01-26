@@ -20,7 +20,7 @@ public class MovieModel implements Parcelable{
     private int id;
 
     public MovieModel(String originalTitle, double userRating, String releaseDate, String plotSynopsis,
-                      String posterPath, String vote_count, String backdropPath, int id) {
+                      String vote_count, String backdropPath, int id,String posterPath) {
         this.title = originalTitle;
         this.userRating = userRating;
         this.releaseDate = releaseDate;

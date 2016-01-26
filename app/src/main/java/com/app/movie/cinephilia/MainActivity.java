@@ -1,17 +1,27 @@
 package com.app.movie.cinephilia;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String msg = "Android: ";
+    private Utility utility;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,8 +59,6 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-    /*******  Added for verifying activity lifecycle   *******/
     /** Called when the activity is about to become visible. */
     @Override
     protected void onStart() {
@@ -61,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
     /** Called when the activity has become visible. */
     @Override
     protected void onResume() {
+        this.utility = new Utility();
+        registerReceiver(utility,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         super.onResume();
         Log.d(msg, "The onResume() event");
     }
@@ -68,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
     /** Called when another activity is taking focus. */
     @Override
     protected void onPause() {
+        unregisterReceiver(utility);
         super.onPause();
         Log.d(msg, "The onPause() event");
     }

@@ -6,15 +6,12 @@ package com.app.movie.cinephilia.reviews;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.app.movie.cinephilia.DataBus.AsyncTaskResultEvent;
 import com.app.movie.cinephilia.DataBus.BusProvider;
-import com.app.movie.cinephilia.DetailsFragment;
 import com.app.movie.cinephilia.OnReviewDataFetchFinished;
 import com.app.movie.cinephilia.R;
 

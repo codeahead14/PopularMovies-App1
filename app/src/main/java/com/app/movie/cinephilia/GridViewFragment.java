@@ -3,11 +3,16 @@ package com.app.movie.cinephilia;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,6 +23,9 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import com.app.movie.cinephilia.MovieDBAPIs.MovieContract;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,6 +34,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,11 +43,13 @@ import org.json.JSONObject;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class GridViewFragment extends Fragment {
+public class GridViewFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = GridViewFragment.class.getSimpleName();
     private GridViewAdapter mGridAdapter;
     private ArrayList<MovieModel> mGridData;
+    private static final int LOADER_FAVOURITE_MOVIES_ID = 1001;
+
     public GridViewFragment() {
     }
 
@@ -57,7 +68,14 @@ public class GridViewFragment extends Fragment {
         FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity(), mGridAdapter);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String order = sharedPreferences.getString("Sort",getString(R.string.pref_sort_order));
-        fetchMovieTask.execute(order, Integer.toString(5));
+
+        if(order.equals("Show Favorites")){
+            Log.v(TAG,"order: "+order);
+            getLoaderManager().restartLoader(LOADER_FAVOURITE_MOVIES_ID, null, this);
+        }else {
+            Log.v(TAG, "fetch order: " + order);
+            fetchMovieTask.execute(order, Integer.toString(5));
+        }
     }
 
     @Override
@@ -73,6 +91,12 @@ public class GridViewFragment extends Fragment {
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState){
+        //getLoaderManager().initLoader(LOADER_FAVOURITE_MOVIES_ID, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = (View) inflater.inflate(R.layout.fragment_main, container, false);
@@ -85,11 +109,51 @@ public class GridViewFragment extends Fragment {
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                /*if (getActivity().findViewById(R.id.container)  != null) {
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                    fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//                    Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_details);
+//                    if (fragment == null) {
+                    MovieModel movie = (MovieModel) parent.getAdapter().getItem(position);
+                    Fragment fragment = DetailsFragment.newInstance(movie);
+                    fragmentManager.beginTransaction().add(R.id.container, fragment).commit();
+                } else {*/
                 MovieModel item = mGridAdapter.getItem(position);
                 Intent intent = new Intent(getActivity(), DetailsActivity.class).putExtra(Intent.EXTRA_TEXT, item);
                 startActivity(intent);
             }
         });
         return rootView;
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(getActivity(), MovieContract.FavoriteMoviesEntry.CONTENT_URI, null, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        ArrayList<MovieModel> movies = new ArrayList<>();
+        Log.v(TAG,"count: "+Integer.toString(cursor.getCount()));
+        while (cursor.moveToNext()) {
+            Log.v(TAG,"title: "+cursor.getString(
+                    cursor.getColumnIndex(MovieContract.FavoriteMoviesEntry.COLUMN_ORIGINAL_TITLE)));
+            MovieModel movie = new MovieModel(cursor.getString(
+                            cursor.getColumnIndex(MovieContract.FavoriteMoviesEntry.COLUMN_ORIGINAL_TITLE)),
+                    cursor.getDouble(cursor.getColumnIndex(MovieContract.FavoriteMoviesEntry.COLUMN_VOTE_AVG)),
+                    cursor.getString(cursor.getColumnIndex(MovieContract.FavoriteMoviesEntry.COLUMN_RELEASE_DATE)),
+                    cursor.getString(cursor.getColumnIndex(MovieContract.FavoriteMoviesEntry.COLUMN_OVERVIEW)),
+                    cursor.getString(cursor.getColumnIndex(MovieContract.FavoriteMoviesEntry.COLUMN_VOTE_COUNT)),
+                    cursor.getString(cursor.getColumnIndex(MovieContract.FavoriteMoviesEntry.COLUMN_BACKDROP_URL)),
+                    cursor.getInt(cursor.getColumnIndex(MovieContract.FavoriteMoviesEntry.COLUMN_MOVIE_ID)),
+                    cursor.getString(cursor.getColumnIndex(MovieContract.FavoriteMoviesEntry.COLUMN_POSTER_URL)));
+            movies.add(movie);
+        }
+        cursor.close();
+        mGridAdapter.updateValues(movies);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
     }
 }

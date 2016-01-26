@@ -64,8 +64,8 @@ public class MovieContract {
         }
 
         // content://..../MovieId
-        public static Uri buildFavouriteMoviesUriWithMovieId(String MovieId) {
-            return CONTENT_URI.buildUpon().appendPath(MovieId).build();
+        public static Uri buildFavouriteMoviesUriWithMovieId(int MovieId) {
+            return CONTENT_URI.buildUpon().appendPath(Integer.toString(MovieId)).build();
         }
 
     }

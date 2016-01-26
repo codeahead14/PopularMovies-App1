@@ -163,10 +163,10 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
                         post.getDouble(VOTE_AVERAGE_KEY),
                         post.getString(RELEASE_DATE_KEY),
                         post.getString(OVERVIEW_KEY),
-                        post.getString(POSTER_PATH_KEY),
                         post.getString(VOTE_COUNT),
                         post.getString(BACKDROP_PATH_KEY),
-                        post.getInt(ID));
+                        post.getInt(ID),
+                        post.getString(POSTER_PATH_KEY));
                 items.add(movie);
             }
             return items;

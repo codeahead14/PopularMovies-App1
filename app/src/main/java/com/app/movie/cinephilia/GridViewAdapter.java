@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by GAURAV on 12-12-2015.
@@ -24,6 +25,7 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
     private static final String TAG=GridViewAdapter.class.getSimpleName();
     private Context mContext;
     private int layoutResourceId;
+    private final Object mLock = new Object();
     private ArrayList<MovieModel> mGridData = new ArrayList<>();
 
     public GridViewAdapter(Context mContext, int layoutResourceId, ArrayList<MovieModel> mGridData){
@@ -62,5 +64,10 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
 
     static class ViewHolder {
         ImageView imageView;
+    }
+
+    public void updateValues(ArrayList<MovieModel> elements) {
+        this.mGridData = elements;
+        notifyDataSetChanged();
     }
 }

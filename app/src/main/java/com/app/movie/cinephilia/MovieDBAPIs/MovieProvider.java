@@ -7,9 +7,11 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.graphics.Movie;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.app.movie.cinephilia.MovieDBAPIs.MovieContract.FavoriteMoviesEntry;
 
@@ -18,19 +20,25 @@ import com.app.movie.cinephilia.MovieDBAPIs.MovieContract.FavoriteMoviesEntry;
  */
 public class MovieProvider extends ContentProvider {
     // The URI Matcher used by this content provider.
+    private static final String TAG = MovieProvider.class.getSimpleName();
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private MovieDBHelper mOpenHelper;
+    private static SQLiteQueryBuilder sQueryBuilder;
 
     static final int FAVOURITES = 100;
     static final int FAVOURITE_WITH_ID = 101;
 
+    static {
+        sQueryBuilder = new SQLiteQueryBuilder();
+        sQueryBuilder.setTables(FavoriteMoviesEntry.TABLE_NAME);
+    }
 
     static UriMatcher buildUriMatcher() {
         // 1) The code passed into the constructor represents the code to return for the root
         // URI.  It's common to use NO_MATCH as the code for this case. Add the constructor below.
         final UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         mUriMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_FAVOURITES,FAVOURITES);
-        mUriMatcher.addURI(MovieContract.CONTENT_AUTHORITY,MovieContract.PATH_FAVOURITES+"/*", FAVOURITE_WITH_ID);
+        mUriMatcher.addURI(MovieContract.CONTENT_AUTHORITY,MovieContract.PATH_FAVOURITES+"/#", FAVOURITE_WITH_ID);
         return mUriMatcher;
     }
 
@@ -43,6 +51,7 @@ public class MovieProvider extends ContentProvider {
     @Override
     public Cursor query (Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder){
         Cursor retCursor;
+        Log.v(TAG,"uri: "+uri.toString());
         int match = sUriMatcher.match(uri);
         switch(match){
             case FAVOURITES:{
@@ -130,6 +139,10 @@ public class MovieProvider extends ContentProvider {
         switch (match){
             case FAVOURITES:
                 retVal = db.delete(MovieContract.FavoriteMoviesEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+            case FAVOURITE_WITH_ID:
+                retVal = db.delete(FavoriteMoviesEntry.TABLE_NAME, FavoriteMoviesEntry.COLUMN_MOVIE_ID + " = ?",
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
