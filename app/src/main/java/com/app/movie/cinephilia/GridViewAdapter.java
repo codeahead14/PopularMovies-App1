@@ -35,9 +35,19 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
         this.mGridData = mGridData;
     }
 
+    public ArrayList<MovieModel> getMovies(){
+        return mGridData;
+    }
+
     public void setGridData(ArrayList<MovieModel> mGridData){
         this.mGridData = mGridData;
         notifyDataSetChanged();
+    }
+
+    @Override
+    public int getCount(){
+        Log.v(TAG,"count: "+mGridData.size());
+        return mGridData.size();
     }
 
     @Override

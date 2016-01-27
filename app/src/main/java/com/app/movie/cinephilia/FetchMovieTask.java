@@ -30,6 +30,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
     private ProgressDialog progress;
     private Activity mActivity;
     private GridViewAdapter mGridAdapter;
+    private OnMovieDataFetchFinished fetchFinishedCallback;
+
     private static final int PAGE_LIMIT = 2;
     public static final String TOTAL_PAGES_KEY = "total_pages";
     public static final String TOTAL_RESULTS_KEY = "total_results";
@@ -45,8 +47,9 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
     public static final String RESULTS_kEY = "results";
     public static final String ID = "id";
 
-    public FetchMovieTask(Activity activity, GridViewAdapter mGridAdapter){
+    public FetchMovieTask(Activity activity, OnMovieDataFetchFinished callback, GridViewAdapter mGridAdapter){
         this.mActivity = activity;
+        this.fetchFinishedCallback = callback;
         this.mGridAdapter = mGridAdapter;
     }
 
@@ -145,9 +148,10 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
     protected void onPostExecute(ArrayList<MovieModel> result){
         if(result != null){
             mGridAdapter.clear();
-            for(MovieModel elem: result) {
+            fetchFinishedCallback.MovieDataFetchFinished(result);
+            /*for(MovieModel elem: result) {
                 mGridAdapter.add(elem);
-            }
+            }*/
         }
         progress.dismiss();
     }

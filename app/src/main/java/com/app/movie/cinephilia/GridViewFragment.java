@@ -31,6 +31,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -43,19 +44,32 @@ import org.json.JSONObject;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class GridViewFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class GridViewFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
+                                        OnMovieDataFetchFinished {
 
     private static final String TAG = GridViewFragment.class.getSimpleName();
     private GridViewAdapter mGridAdapter;
     private ArrayList<MovieModel> mGridData;
     private static final int LOADER_FAVOURITE_MOVIES_ID = 1001;
+    private static final String MOVIES_TAG = "MovieModel";
 
     public GridViewFragment() {
     }
 
     @Override
-    public void onCreate(Bundle savedInstances) {
-        super.onCreate(savedInstances);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mGridData = new ArrayList<>();
+        mGridAdapter = new GridViewAdapter(getActivity(), R.layout.grid_item_layout, mGridData);
+        if (savedInstanceState != null) {
+            mGridData = savedInstanceState.getParcelableArrayList(MOVIES_TAG);
+        }
+        if (mGridData == null) {
+            updateGrid();
+        } else {
+            mGridAdapter.updateValues(mGridData);
+        }
+
         setHasOptionsMenu(true);
     }
 
@@ -65,7 +79,6 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     public void updateGrid(){
-        FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity(), mGridAdapter);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String order = sharedPreferences.getString("Sort",getString(R.string.pref_sort_order));
 
@@ -74,13 +87,14 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
             getLoaderManager().restartLoader(LOADER_FAVOURITE_MOVIES_ID, null, this);
         }else {
             Log.v(TAG, "fetch order: " + order);
+            FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity(),this,mGridAdapter);
             fetchMovieTask.execute(order, Integer.toString(5));
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        outState.putParcelableArrayList("MovieModel", mGridData);
+        outState.putParcelableArrayList(MOVIES_TAG, mGridAdapter.getMovies());
         super.onSaveInstanceState(outState);
     }
 
@@ -97,15 +111,18 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
+    public void MovieDataFetchFinished(ArrayList<MovieModel> movies){
+        mGridAdapter.updateValues(movies);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = (View) inflater.inflate(R.layout.fragment_main, container, false);
         GridView mGridView = (GridView) rootView.findViewById(R.id.gridview);
 
-        mGridData = new ArrayList<>();
-        mGridAdapter = new GridViewAdapter(getActivity(), R.layout.grid_item_layout, mGridData);
         mGridView.setAdapter(mGridAdapter);
-
+        Log.v(TAG,"view count: "+mGridAdapter.getCount());
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -119,12 +136,18 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
                     fragmentManager.beginTransaction().add(R.id.container, fragment).commit();
                 } else {*/
                 MovieModel item = mGridAdapter.getItem(position);
+                Log.v(TAG,"Movie at position: "+position+" is "+item.getTitle());
                 Intent intent = new Intent(getActivity(), DetailsActivity.class).putExtra(Intent.EXTRA_TEXT, item);
                 startActivity(intent);
             }
         });
         return rootView;
     }
+
+    /*@Override
+    public int getCount(){
+        return mGridData.size();
+    }*/
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -134,7 +157,7 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         ArrayList<MovieModel> movies = new ArrayList<>();
-        Log.v(TAG,"count: "+Integer.toString(cursor.getCount()));
+        Log.v(TAG,"fragment count: "+Integer.toString(cursor.getCount()));
         while (cursor.moveToNext()) {
             Log.v(TAG,"title: "+cursor.getString(
                     cursor.getColumnIndex(MovieContract.FavoriteMoviesEntry.COLUMN_ORIGINAL_TITLE)));

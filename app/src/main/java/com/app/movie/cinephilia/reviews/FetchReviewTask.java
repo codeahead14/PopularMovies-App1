@@ -12,7 +12,7 @@ import android.util.Log;
 
 import com.app.movie.cinephilia.DataBus.AsyncTaskResultEvent;
 import com.app.movie.cinephilia.DataBus.BusProvider;
-import com.app.movie.cinephilia.OnReviewDataFetchFinished;
+//import com.app.movie.cinephilia.OnReviewDataFetchFinished;
 import com.app.movie.cinephilia.R;
 
 import org.json.JSONArray;
@@ -31,7 +31,7 @@ public class FetchReviewTask extends AsyncTask<String, Void, ArrayList<MovieRevi
 
     Activity mContext;
     ReviewAdapter mReviewsAdapter;
-    OnReviewDataFetchFinished onReviewDataFetchFinished;
+    //OnReviewDataFetchFinished onReviewDataFetchFinished;
     private ProgressDialog progress;
 
     private final String LOG_TAG = FetchReviewTask.class.getSimpleName();

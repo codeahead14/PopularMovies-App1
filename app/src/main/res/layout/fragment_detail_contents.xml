@@ -98,11 +98,18 @@
             android:contentDescription="@string/full_image_desc"
             android:scaleType="fitCenter" />
 
+
         <TextView
             android:id="@+id/review_head"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="REVIEWS"
+            android:textSize="@dimen/info_textSize"
+            style="@style/InLayoutPadding"
+            android:paddingBottom="0dp"
+            android:paddingTop="0dp"
+            android:paddingEnd="@dimen/margin_large"
+            android:paddingStart="@dimen/margin_large"
             android:textColor="@color/colorPrimaryDark" />
 
         <!--<include layout="@layout/review_list_layout" />-->
@@ -110,7 +117,10 @@
             android:id="@+id/review_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:orientation="vertical"
+            android:paddingEnd="@dimen/margin_large"
+            android:paddingStart="@dimen/margin_large"
+            style="@style/InLayoutPadding"/>
 
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>
