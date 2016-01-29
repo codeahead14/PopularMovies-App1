@@ -20,4 +20,7 @@
     <dimen name="margin_large">16dp</dimen>
     <dimen name="margin_for_fab">88dp</dimen>
 
+    <!-- Details Fragment parameters -->
+    <dimen name="details_backdrop_height">256dp</dimen>
+
 </resources>

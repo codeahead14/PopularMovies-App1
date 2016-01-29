@@ -39,9 +39,14 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
         return mGridData;
     }
 
-    public void setGridData(ArrayList<MovieModel> mGridData){
-        this.mGridData = mGridData;
-        notifyDataSetChanged();
+    @Override
+    public MovieModel getItem(int position) {
+        return mGridData.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @Override
@@ -63,7 +68,7 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
         } else
             holder = (ViewHolder)row.getTag();
 
-        MovieModel item = mGridData.get(pos);
+        MovieModel item = getItem(pos);
         Picasso.with(mContext)
                 .load(item.getPosterUrl())
                 .placeholder(R.drawable.loading)

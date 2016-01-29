@@ -104,11 +104,11 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
         updateGrid();
     }
 
-    @Override
+    /*@Override
     public void onActivityCreated(Bundle savedInstanceState){
         //getLoaderManager().initLoader(LOADER_FAVOURITE_MOVIES_ID, null, this);
         super.onActivityCreated(savedInstanceState);
-    }
+    }*/
 
     @Override
     public void MovieDataFetchFinished(ArrayList<MovieModel> movies){
@@ -135,10 +135,11 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
                     Fragment fragment = DetailsFragment.newInstance(movie);
                     fragmentManager.beginTransaction().add(R.id.container, fragment).commit();
                 } else {*/
-                MovieModel item = mGridAdapter.getItem(position);
-                Log.v(TAG,"Movie at position: "+position+" is "+item.getTitle());
-                Intent intent = new Intent(getActivity(), DetailsActivity.class).putExtra(Intent.EXTRA_TEXT, item);
-                startActivity(intent);
+                    MovieModel item = mGridAdapter.getItem(position);
+                    Log.v(TAG, "Movie at position: " + position + " is " + item.getTitle());
+                    Intent intent = new Intent(getActivity(), DetailsActivity.class).putExtra(Intent.EXTRA_TEXT, item);
+                    startActivity(intent);
+                //}
             }
         });
         return rootView;
