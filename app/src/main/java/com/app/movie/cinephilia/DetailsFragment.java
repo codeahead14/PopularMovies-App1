@@ -17,6 +17,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -39,7 +41,7 @@ import java.util.ArrayList;
  */
 public class DetailsFragment extends Fragment {
     private static final String TAG = DetailsFragment.class.getSimpleName();
-    private boolean mHasData;
+    private boolean mHasData, isExpanded=false;
     private Intent intent;
     private MovieModel movie;
     private ArrayList<MovieReviewModel> mReviewData;
@@ -49,6 +51,7 @@ public class DetailsFragment extends Fragment {
     private static Toolbar toolbar;
     private static CollapsingToolbarLayout collapsingToolbar;
     private static FloatingActionButton fab;
+    private static ImageButton mButton;
     private ImageView imageView;
 
     private ContentResolver resolver;
@@ -158,6 +161,8 @@ public class DetailsFragment extends Fragment {
         setupWidgets(rootView);
 
         fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        mButton = (ImageButton)rootView.findViewById(R.id.show_review_button);
+        mButton.setImageResource(R.drawable.ic_arrow_drop_down_black_24dp);
 
         if(mHasData){
             mDetailsActivityCallback.setTitleandBackDrop(movie.getTitle(), movie.getBackdropUrl());
@@ -176,6 +181,20 @@ public class DetailsFragment extends Fragment {
                 }
             });
 
+            mButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(!isExpanded) {
+                        mButton.setImageResource(R.drawable.ic_arrow_drop_up_black_24dp);
+                        mLinearLayout.setVisibility(View.GONE);
+                        isExpanded = true;
+                    }else {
+                        isExpanded = false;
+                        mButton.setImageResource(R.drawable.ic_arrow_drop_down_black_24dp);
+                        mLinearLayout.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
 
             TextView titleTextView = (TextView)rootView.findViewById(R.id.text_view_title);
             titleTextView.setText(movie.getTitle());
@@ -221,10 +240,6 @@ public class DetailsFragment extends Fragment {
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         collapsingToolbar = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsing_toolbar);
-        //to Change the scrollflags programmatically
-        /*AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) collapsingToolbar.getLayoutParams();
-        params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS_COLLAPSED); // list other flags here by |
-        collapsingToolbar.setLayoutParams(params);*/
     }
 
     @Subscribe

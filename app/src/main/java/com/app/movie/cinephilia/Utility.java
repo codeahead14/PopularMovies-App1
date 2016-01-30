@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,15 +23,18 @@ import java.io.IOException;
 public class Utility extends BroadcastReceiver{
     private Context mContext;
     private ConnectivityManager connectivityManager;
+    private static View parentLayout;
 
-    Utility(){
-
+    Utility(View view){
+        parentLayout = view;
     }
 
     @Override
     public void onReceive(Context context, Intent intent){
         if(!hasConnection(context)){
-            alert(context);
+            //alert(context);
+            Snackbar.make(parentLayout, "NO INTERNET CCONNECTION",
+                                    Snackbar.LENGTH_LONG).show();
         }
     }
 

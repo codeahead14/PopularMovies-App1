@@ -37,10 +37,10 @@
 
     <!-- Define android:paddingEnd and Start in the layout, since it requires Min API level 17 -->
     <style name="InLayoutPadding">
-        <item name="android:paddingTop">@dimen/margin_large</item>
-        <item name="android:paddingRight">@dimen/margin_large</item>
-        <item name="android:paddingLeft">@dimen/margin_large</item>
-        <item name="android:paddingBottom">@dimen/margin_large</item>
+        <item name="android:paddingTop">@dimen/margin_default</item>
+        <item name="android:paddingRight">@dimen/margin_default</item>
+        <item name="android:paddingLeft">@dimen/margin_default</item>
+        <item name="android:paddingBottom">@dimen/margin_default</item>
     </style>
 
 </resources>

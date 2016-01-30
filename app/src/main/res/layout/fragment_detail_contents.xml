@@ -14,6 +14,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
+        style="@style/InLayoutPadding"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -81,12 +82,10 @@
         </LinearLayout>
 
         <TextView
+            style="@style/InLayoutPadding"
             android:id="@+id/text_view_synopsis"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="20dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
             android:text="What it is about!!" />
 
 
@@ -99,28 +98,46 @@
             android:scaleType="fitCenter" />
 
 
-        <TextView
-            android:id="@+id/review_head"
-            android:layout_width="wrap_content"
+
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="REVIEWS"
-            android:textSize="@dimen/info_textSize"
-            style="@style/InLayoutPadding"
-            android:paddingBottom="0dp"
-            android:paddingTop="0dp"
-            android:paddingEnd="@dimen/margin_large"
-            android:paddingStart="@dimen/margin_large"
-            android:textColor="@color/colorPrimaryDark" />
+            style="@style/InLayoutPadding">
+
+            <TextView
+                android:id="@+id/review_head"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="REVIEWS"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:textSize="@dimen/info_textSize"
+                android:textColor="@color/colorPrimaryDark"
+                android:gravity="bottom"/>
+
+            <ImageButton
+                android:id="@+id/show_review_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/review_head"
+                android:layout_toRightOf="@+id/review_head"
+                android:foregroundGravity="top"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                style="?android:attr/borderlessButtonStyle"/>
+
+        </RelativeLayout>
 
         <!--<include layout="@layout/review_list_layout" />-->
         <LinearLayout
+            style="@style/InLayoutPadding"
             android:id="@+id/review_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingEnd="@dimen/margin_large"
             android:paddingStart="@dimen/margin_large"
-            style="@style/InLayoutPadding"/>
+            android:visibility="gone"/>
 
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

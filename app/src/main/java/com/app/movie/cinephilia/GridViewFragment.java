@@ -59,16 +59,16 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mGridData = new ArrayList<>();
-        mGridAdapter = new GridViewAdapter(getActivity(), R.layout.grid_item_layout, mGridData);
-        if (savedInstanceState != null) {
+        mGridData = null;
+        mGridAdapter = new GridViewAdapter(getActivity(), R.layout.grid_item_layout, new ArrayList<MovieModel>());
+        /*if (savedInstanceState != null) {
             mGridData = savedInstanceState.getParcelableArrayList(MOVIES_TAG);
-        }
-        if (mGridData == null) {
+        }*/
+        /*if (mGridData == null) {
             updateGrid();
         } else {
             mGridAdapter.updateValues(mGridData);
-        }
+        }*/
 
         setHasOptionsMenu(true);
     }
@@ -88,7 +88,7 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
         }else {
             Log.v(TAG, "fetch order: " + order);
             FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity(),this,mGridAdapter);
-            fetchMovieTask.execute(order, Integer.toString(5));
+            fetchMovieTask.execute(order);
         }
     }
 
@@ -101,14 +101,9 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onStart(){
         super.onStart();
+        mGridAdapter.clear();
         updateGrid();
     }
-
-    /*@Override
-    public void onActivityCreated(Bundle savedInstanceState){
-        //getLoaderManager().initLoader(LOADER_FAVOURITE_MOVIES_ID, null, this);
-        super.onActivityCreated(savedInstanceState);
-    }*/
 
     @Override
     public void MovieDataFetchFinished(ArrayList<MovieModel> movies){
@@ -118,11 +113,12 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        //Log.v(TAG,"On Createview");
         View rootView = (View) inflater.inflate(R.layout.fragment_main, container, false);
         GridView mGridView = (GridView) rootView.findViewById(R.id.gridview);
-
+        mGridView.setEmptyView(rootView.findViewById(R.id.emptyView));
         mGridView.setAdapter(mGridAdapter);
-        Log.v(TAG,"view count: "+mGridAdapter.getCount());
+        Log.v(TAG, "view count: " + mGridAdapter.getCount());
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -144,11 +140,6 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
         });
         return rootView;
     }
-
-    /*@Override
-    public int getCount(){
-        return mGridData.size();
-    }*/
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

@@ -120,6 +120,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
     }
 
     protected ArrayList<MovieModel> doInBackground(String... params) {
+        Log.v(LOG_TAG2,"in background");
         try {
             if(params[0].equals("Most Popular"))
                 sort_by = "popularity.desc";

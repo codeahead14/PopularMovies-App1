@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -15,17 +17,21 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String msg = "Android: ";
     private Utility utility;
+    private static View parentLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        parentLayout = findViewById(R.id.container);
+        PreferenceManager.setDefaultValues(this, R.xml.user_preference, false);
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -69,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     /** Called when the activity has become visible. */
     @Override
     protected void onResume() {
-        this.utility = new Utility();
+        this.utility = new Utility(parentLayout);
         registerReceiver(utility,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         super.onResume();
         Log.d(msg, "The onResume() event");

@@ -36,12 +36,12 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
     }
 
     public ArrayList<MovieModel> getMovies(){
-        return mGridData;
+        return this.mGridData;
     }
 
     @Override
     public MovieModel getItem(int position) {
-        return mGridData.get(position);
+        return this.mGridData.get(position);
     }
 
     @Override
@@ -51,8 +51,13 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
 
     @Override
     public int getCount(){
-        Log.v(TAG,"count: "+mGridData.size());
-        return mGridData.size();
+        return this.mGridData.size();
+    }
+
+    @Override
+    public void clear(){
+        this.mGridData.clear();
+        notifyDataSetChanged();
     }
 
     @Override
@@ -64,11 +69,13 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
             row = inflater.inflate(layoutResourceId, parent, false);
             holder = new ViewHolder();
             holder.imageView = (ImageView) row.findViewById(R.id.grid_item_image);
+            holder.textView = (TextView) row.findViewById(R.id.grid_item_text);
             row.setTag(holder);
         } else
             holder = (ViewHolder)row.getTag();
 
         MovieModel item = getItem(pos);
+        holder.textView.setText(item.getTitle());
         Picasso.with(mContext)
                 .load(item.getPosterUrl())
                 .placeholder(R.drawable.loading)
@@ -79,6 +86,7 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
 
     static class ViewHolder {
         ImageView imageView;
+        TextView textView;
     }
 
     public void updateValues(ArrayList<MovieModel> elements) {

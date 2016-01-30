@@ -23,4 +23,5 @@
     <string name="pref_sort_order">"Most Popular"</string>
     <string name="full_image_desc">This is full screen image of the movie </string>
     <string name="notOnline">Not Connected to the Internet</string>
+    <string name="empty">Nothing to Show Right Now</string>
 </resources>
