@@ -29,7 +29,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
     private String sort_by = null;
     private ProgressDialog progress;
     private Activity mActivity;
-    private GridViewAdapter mGridAdapter;
     private OnMovieDataFetchFinished fetchFinishedCallback;
 
     private static final int PAGE_LIMIT = 2;
@@ -47,12 +46,10 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
     public static final String RESULTS_kEY = "results";
     public static final String ID = "id";
 
-    public FetchMovieTask(Activity activity, OnMovieDataFetchFinished callback, GridViewAdapter mGridAdapter){
+    public FetchMovieTask(Activity activity, OnMovieDataFetchFinished callback){
         this.mActivity = activity;
         this.fetchFinishedCallback = callback;
-        this.mGridAdapter = mGridAdapter;
     }
-
 
 
     public ArrayList<MovieModel> getMovies(String sort_by) throws IOException{
@@ -148,7 +145,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
     @Override
     protected void onPostExecute(ArrayList<MovieModel> result){
         if(result != null){
-            mGridAdapter.clear();
             fetchFinishedCallback.MovieDataFetchFinished(result);
             /*for(MovieModel elem: result) {
                 mGridAdapter.add(elem);

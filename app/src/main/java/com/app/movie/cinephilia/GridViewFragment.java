@@ -87,7 +87,7 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
             getLoaderManager().restartLoader(LOADER_FAVOURITE_MOVIES_ID, null, this);
         }else {
             Log.v(TAG, "fetch order: " + order);
-            FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity(),this,mGridAdapter);
+            FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity(),this);
             fetchMovieTask.execute(order);
         }
     }
@@ -101,12 +101,12 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onStart(){
         super.onStart();
-        mGridAdapter.clear();
         updateGrid();
     }
 
     @Override
     public void MovieDataFetchFinished(ArrayList<MovieModel> movies){
+        mGridAdapter.clear();
         mGridAdapter.updateValues(movies);
     }
 
