@@ -114,6 +114,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
         progress.setIndeterminate(true);
         progress.setCancelable(false);
         progress.show();
+        java.lang.Thread.dumpStack();
     }
 
     protected ArrayList<MovieModel> doInBackground(String... params) {

@@ -143,12 +143,14 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        mGridAdapter.clear();
         return new CursorLoader(getActivity(), MovieContract.FavoriteMoviesEntry.CONTENT_URI, null, null, null, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         ArrayList<MovieModel> movies = new ArrayList<>();
+        mGridAdapter.clear();
         Log.v(TAG,"fragment count: "+Integer.toString(cursor.getCount()));
         while (cursor.moveToNext()) {
             Log.v(TAG,"title: "+cursor.getString(

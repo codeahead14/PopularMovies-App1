@@ -184,12 +184,12 @@ public class DetailsFragment extends Fragment {
             mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(!isExpanded) {
+                    if(isExpanded) {
                         mButton.setImageResource(R.drawable.ic_arrow_drop_up_black_24dp);
                         mLinearLayout.setVisibility(View.GONE);
-                        isExpanded = true;
-                    }else {
                         isExpanded = false;
+                    }else {
+                        isExpanded = true;
                         mButton.setImageResource(R.drawable.ic_arrow_drop_down_black_24dp);
                         mLinearLayout.setVisibility(View.VISIBLE);
                     }

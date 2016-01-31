@@ -29,6 +29,11 @@ public class ReviewAdapter extends ArrayAdapter<MovieReviewModel> {
     }
 
     @Override
+    public int getCount(){
+        return this.mReviewData.size();
+    }
+
+    @Override
     public View getView(int pos, View convertView, ViewGroup parent){
         ViewHolder viewHolder;
         if(convertView == null){
