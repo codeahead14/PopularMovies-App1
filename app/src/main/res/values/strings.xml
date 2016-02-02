@@ -24,4 +24,6 @@
     <string name="full_image_desc">This is full screen image of the movie </string>
     <string name="notOnline">Not Connected to the Internet</string>
     <string name="empty">Nothing to Show Right Now</string>
+    <string name="imageDescription">Placeholder for Image Content Description</string>
+
 </resources>

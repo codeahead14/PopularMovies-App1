@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.facebook.stetho.urlconnection.SimpleRequestEntity;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,12 +48,17 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
     public static final String RESULTS_kEY = "results";
     public static final String ID = "id";
 
+    private static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";
+    private static final String GZIP_ENCODING = "gzip";
+
     public FetchMovieTask(Activity activity, OnMovieDataFetchFinished callback){
         this.mActivity = activity;
         this.fetchFinishedCallback = callback;
     }
 
-
+    private static void requestDecompression(HttpURLConnection conn) {
+        conn.setRequestProperty(HEADER_ACCEPT_ENCODING, GZIP_ENCODING);
+    }
     public ArrayList<MovieModel> getMovies(String sort_by) throws IOException{
         String responseJSONStr;
         ArrayList<MovieModel> movies = new ArrayList<>();

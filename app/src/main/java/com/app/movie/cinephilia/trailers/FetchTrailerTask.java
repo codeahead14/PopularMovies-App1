@@ -1,8 +1,4 @@
-package com.app.movie.cinephilia.reviews;
-
-/**
- * Created by GAURAV on 22-01-2016.
- */
+package com.app.movie.cinephilia.trailers;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -12,7 +8,6 @@ import android.util.Log;
 
 import com.app.movie.cinephilia.DataBus.AsyncTaskResultEvent;
 import com.app.movie.cinephilia.DataBus.BusProvider;
-//import com.app.movie.cinephilia.OnReviewDataFetchFinished;
 import com.app.movie.cinephilia.R;
 
 import org.json.JSONArray;
@@ -27,19 +22,22 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class FetchReviewTask extends AsyncTask<String, Void, ArrayList<MovieReviewModel>>{
+/**
+ * Created by GAURAV on 31-01-2016.
+ */
+public class FetchTrailerTask extends AsyncTask<String, Void, ArrayList<MovieTrailerModel>> {
 
     Activity mContext;
-    ReviewAdapter mReviewsAdapter;
+    TrailerAdapter mTrailersAdapter;
     //OnReviewDataFetchFinished onReviewDataFetchFinished;
     private ProgressDialog progress;
 
-    private final String LOG_TAG = FetchReviewTask.class.getSimpleName();
+    private final String LOG_TAG = FetchTrailerTask.class.getSimpleName();
 
 
-    public FetchReviewTask(Activity context, ReviewAdapter adapter){ //, OnReviewDataFetchFinished onReviewDataFetchFinished){
+    public FetchTrailerTask(Activity context, TrailerAdapter adapter){ //, OnReviewDataFetchFinished onReviewDataFetchFinished){
         this.mContext = context;
-        this.mReviewsAdapter = adapter;
+        this.mTrailersAdapter = adapter;
         //this.onReviewDataFetchFinished = onReviewDataFetchFinished;
     }
 
@@ -54,7 +52,7 @@ public class FetchReviewTask extends AsyncTask<String, Void, ArrayList<MovieRevi
     }
 
     @Override
-    protected ArrayList<MovieReviewModel> doInBackground(String... params) {
+    protected ArrayList<MovieTrailerModel> doInBackground(String... params) {
 
         String movieId;
 
@@ -80,7 +78,7 @@ public class FetchReviewTask extends AsyncTask<String, Void, ArrayList<MovieRevi
 
             final String API_KEY_PARAM = "api_key";
 
-            final String APPEND_PATH = "reviews";//params[1];
+            final String APPEND_PATH = "videos";//params[1];
 
             Uri builtUri = Uri.parse(MOVIE_BASE_URL).buildUpon()
                     .appendPath(movieId)
@@ -108,9 +106,6 @@ public class FetchReviewTask extends AsyncTask<String, Void, ArrayList<MovieRevi
 
             String line;
             while ((line = reader.readLine()) != null) {
-                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                // But it does make debugging a *lot* easier if you print out the completed
-                // buffer for debugging.
                 buffer.append(line + "\n");
             }
 
@@ -150,51 +145,54 @@ public class FetchReviewTask extends AsyncTask<String, Void, ArrayList<MovieRevi
         return null;
     }
 
-    private ArrayList<MovieReviewModel> getReviewsDataFromJson(String reviewsJsonStr)
+    private ArrayList<MovieTrailerModel> getReviewsDataFromJson(String reviewsJsonStr)
             throws JSONException {
 
         // Define json paths
-        final String REVIEW_AUTHOR = "author";
-        final String REVIEW_CONTENT = "content";
+        final String TRAILER_NAME = "name";
+        final String TRAILER_KEY = "key";
+        final String TRAILER_SITE = "site";
+        String name;
+        String key;
+        String site;
 
         JSONObject reviewJson = new JSONObject(reviewsJsonStr);
         JSONArray reviewArray = reviewJson.getJSONArray("results");
 
-        ArrayList<MovieReviewModel> reviews = new ArrayList<MovieReviewModel>(reviewArray.length());
+        ArrayList<MovieTrailerModel> reviews = new ArrayList<MovieTrailerModel>(reviewArray.length());
         for(int i = 0; i < reviewArray.length(); i++) {
-            String author;
-            String content;
 
             // Get the JSON object representing the movie
             JSONObject reviewObject = reviewArray.getJSONObject(i);
 
-            author = reviewObject.getString(REVIEW_AUTHOR);
-            content = reviewObject.getString(REVIEW_CONTENT);
+            name = reviewObject.getString(TRAILER_NAME);
+            key = reviewObject.getString(TRAILER_KEY);
+            site = reviewObject.getString(TRAILER_SITE);
 
-            reviews.add(new MovieReviewModel(author, content));
+            reviews.add(new MovieTrailerModel(key,name,site));
         }
 
-        for (MovieReviewModel movieReviewModel : reviews) {
-            Log.v(LOG_TAG, "Review author: " + movieReviewModel.mAuthor);
-            Log.v(LOG_TAG, "Review content: " + movieReviewModel.mContent);
+        for (MovieTrailerModel MovieTrailerModel : reviews) {
+            Log.v(LOG_TAG, "Trailer name: " + MovieTrailerModel.mName);
+            Log.v(LOG_TAG, "Trailer key: " + MovieTrailerModel.mKey);
+            Log.v(LOG_TAG, "Trailer site: " + MovieTrailerModel.mSite);
         }
         return reviews;
 
     }
 
     @Override
-    protected void onPostExecute(ArrayList<MovieReviewModel> result) {
+    protected void onPostExecute(ArrayList<MovieTrailerModel> result) {
 
         Log.v(LOG_TAG, "TASK POST EXECUTE");
         if(result != null){
-            mReviewsAdapter.clear();
-            for(MovieReviewModel elem: result) {
-                mReviewsAdapter.add(elem);
+            mTrailersAdapter.clear();
+            for(MovieTrailerModel elem: result) {
+                mTrailersAdapter.add(elem);
             }
         }
-        //onReviewDataFetchFinished.reviewDataFetchFinished(true);
-        BusProvider.getInstance().post(new AsyncTaskResultEvent(true, "FetchReviewTask"));
-        mReviewsAdapter.notifyDataSetChanged();
+        BusProvider.getInstance().post(new AsyncTaskResultEvent(true, "FetchTrailerTask"));
+        mTrailersAdapter.notifyDataSetChanged();
         progress.dismiss();
     }
 }

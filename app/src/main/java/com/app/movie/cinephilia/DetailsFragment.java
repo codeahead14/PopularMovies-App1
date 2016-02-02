@@ -11,10 +11,15 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -31,6 +36,9 @@ import com.app.movie.cinephilia.MovieDBAPIs.MovieContract.FavoriteMoviesEntry;
 import com.app.movie.cinephilia.reviews.FetchReviewTask;
 import com.app.movie.cinephilia.reviews.MovieReviewModel;
 import com.app.movie.cinephilia.reviews.ReviewAdapter;
+import com.app.movie.cinephilia.trailers.FetchTrailerTask;
+import com.app.movie.cinephilia.trailers.MovieTrailerModel;
+import com.app.movie.cinephilia.trailers.TrailerAdapter;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 
@@ -46,20 +54,23 @@ public class DetailsFragment extends Fragment {
     private MovieModel movie;
     private ArrayList<MovieReviewModel> mReviewData;
     private ReviewAdapter mReviewAdapter;
-    private LinearLayout mLinearLayout;
+    private TrailerAdapter mTrailerAdapter;
+    private LinearLayout mLinearLayoutReview, mLinearLayoutTrailer;
     private UpdateToolBarWidget mDetailsActivityCallback;
     private static Toolbar toolbar;
     private static CollapsingToolbarLayout collapsingToolbar;
     private static FloatingActionButton fab;
     private static ImageButton mButton;
     private ImageView imageView;
-
     private ContentResolver resolver;
 
     private static final String ARG_MOVIE = "movieFragment";
 
+    // Public members
+    public static int mMovieId;
+
     public interface UpdateToolBarWidget{
-        public void setTitleandBackDrop(String title, String backDropPath);
+        void setTitleandBackDrop(String title, String backDropPath);
     }
 
     public DetailsFragment() {
@@ -74,6 +85,23 @@ public class DetailsFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+
+        intent = getActivity().getIntent();
+        if(intent!=null && intent.hasExtra(Intent.EXTRA_TEXT)) {
+            mHasData = true;
+            // Using Parcelable to get parcel object
+            movie = intent.getExtras().getParcelable(Intent.EXTRA_TEXT);
+            // Initializing the ReviewAdapter over listview
+            mMovieId = movie.getId();
+            FetchMovieElements(mMovieId);
+        }
+    }
+
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
@@ -83,22 +111,17 @@ public class DetailsFragment extends Fragment {
         }
     }
 
+    public void FetchMovieElements(int movieId){
+        // Fetch Review data
+        mReviewData = new ArrayList<>();
+        mReviewAdapter = new ReviewAdapter(getActivity(), R.layout.list_item_review, mReviewData);
+        FetchReviewTask reviewTask = new FetchReviewTask(getActivity(), mReviewAdapter);
+        reviewTask.execute(Integer.toString(movie.getId()));
 
-    @Override
-    public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-
-        intent = getActivity().getIntent();
-        if(intent!=null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-            mHasData = true;
-            // Using Parcelable to get parcel object
-            movie = intent.getExtras().getParcelable(Intent.EXTRA_TEXT);
-            // Initializing the ReviewAdapter over listview
-            mReviewData = new ArrayList<>();
-            mReviewAdapter = new ReviewAdapter(getActivity(), R.layout.list_item_review, mReviewData);
-            FetchReviewTask reviewTask = new FetchReviewTask(getActivity(), mReviewAdapter);
-            reviewTask.execute(Integer.toString(movie.getId()));
-        }
+        // Fetch Trailer data
+        mTrailerAdapter = new TrailerAdapter(getActivity(),R.layout.list_item_trailer,new ArrayList<MovieTrailerModel>());
+        FetchTrailerTask trailerTask = new FetchTrailerTask(getActivity(), mTrailerAdapter);
+        trailerTask.execute(Integer.toString(mMovieId));
     }
 
     @Override
@@ -166,7 +189,8 @@ public class DetailsFragment extends Fragment {
 
         if(mHasData){
             mDetailsActivityCallback.setTitleandBackDrop(movie.getTitle(), movie.getBackdropUrl());
-            mLinearLayout = (LinearLayout)rootView.findViewById(R.id.review_list);
+            mLinearLayoutReview = (LinearLayout)rootView.findViewById(R.id.review_list);
+            mLinearLayoutTrailer = (LinearLayout)rootView.findViewById(R.id.trailer_list);
 
             if(isFavourtie(movie.getId()))
                 fab.setImageResource(R.drawable.ic_favorite_white_24dp);
@@ -186,12 +210,12 @@ public class DetailsFragment extends Fragment {
                 public void onClick(View v) {
                     if(isExpanded) {
                         mButton.setImageResource(R.drawable.ic_arrow_drop_up_black_24dp);
-                        mLinearLayout.setVisibility(View.GONE);
+                        mLinearLayoutReview.setVisibility(View.GONE);
                         isExpanded = false;
                     }else {
                         isExpanded = true;
                         mButton.setImageResource(R.drawable.ic_arrow_drop_down_black_24dp);
-                        mLinearLayout.setVisibility(View.VISIBLE);
+                        mLinearLayoutReview.setVisibility(View.VISIBLE);
                     }
                 }
             });
@@ -235,6 +259,30 @@ public class DetailsFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate menu resource file.
+        inflater.inflate(R.menu.menu_details, menu);
+        // Locate MenuItem with ShareActionProvider
+        MenuItem item = menu.findItem(R.id.menu_item_share);
+        // Fetch and store ShareActionProvider
+        ShareActionProvider mShareActionProvider =
+                                    (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+        if (mShareActionProvider != null ) {
+            mShareActionProvider.setShareIntent(createShareForecastIntent());
+        } else {
+            Log.d(TAG, "Share Action Provider is null?");
+        }
+    }
+
+    private Intent createShareForecastIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT,"https://www.youtube.com/watch?v=");
+        return shareIntent;
+    }
+
     private void setupWidgets(View rootView) {
         toolbar = (Toolbar)rootView.findViewById(R.id.detailstoolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
@@ -244,11 +292,20 @@ public class DetailsFragment extends Fragment {
 
     @Subscribe
     public void onMovieLoaded(AsyncTaskResultEvent event){
-        if(event.getResult()){
-            for(int iter=0; iter<mReviewAdapter.getCount();iter++){
-                View item = mReviewAdapter.getView(iter,null,null);
-                //mRelativeLayout.addView(item);
-                mLinearLayout.addView(item);
+        if(event.getResult()) {
+            if (event.getName().equals("FetchReviewTask")) {
+                for (int iter = 0; iter < mReviewAdapter.getCount(); iter++) {
+                    View item = mReviewAdapter.getView(iter, null, null);
+                    //mRelativeLayout.addView(item);
+                    mLinearLayoutReview.addView(item);
+                }
+            } else if (event.getName().equals("FetchTrailerTask")) {
+                Log.v(TAG,"Show trailers: "+Integer.toString(mTrailerAdapter.getCount()));
+                for (int iter = 0; iter < mTrailerAdapter.getCount(); iter++) {
+                    View item = mTrailerAdapter.getView(iter, null, null);
+                    //mRelativeLayout.addView(item);
+                    mLinearLayoutTrailer.addView(item);
+                }
             }
         }
     }

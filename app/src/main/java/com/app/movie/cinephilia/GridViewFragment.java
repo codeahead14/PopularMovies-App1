@@ -26,6 +26,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.app.movie.cinephilia.MovieDBAPIs.MovieContract;
+import com.facebook.stetho.Stetho;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -76,6 +77,13 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.gridviewfragment, menu);
+
+        // Adding Debugging using Stetho
+        Stetho.initialize(
+                Stetho.newInitializerBuilder(getActivity())
+                        .enableDumpapp(Stetho.defaultDumperPluginsProvider(getActivity()))
+                        .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(getActivity()))
+                        .build());
     }
 
     public void updateGrid(){

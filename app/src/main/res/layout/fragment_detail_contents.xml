@@ -51,6 +51,7 @@
                     style="@style/TitleAppearance"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/black"
                     android:paddingBottom="@dimen/margin_default"
                     android:paddingEnd="@dimen/margin_default"
                     android:paddingRight="@dimen/margin_default"
@@ -61,7 +62,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="@dimen/margin_inline"
-                    android:textSize="@dimen/info_textSize" />
+                    android:textSize="@dimen/info_textSize"
+                    android:textColor="@color/black"/>
 
                 <TextView
                     android:id="@+id/text_view_release_date"
@@ -75,7 +77,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="10dp"
-                    android:textSize="@dimen/content_textSize" />
+                    android:textSize="@dimen/content_textSize"/>
 
             </LinearLayout>
 
@@ -86,7 +88,7 @@
             android:id="@+id/text_view_synopsis"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="What it is about!!" />
+            android:textColor="@color/black" />
 
 
         <ImageView
@@ -97,7 +99,27 @@
             android:contentDescription="@string/full_image_desc"
             android:scaleType="fitCenter" />
 
+        <TextView
+            style="@style/InLayoutPadding"
+            android:id="@+id/trailer_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TRAILERS"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold"
+            android:textSize="@dimen/info_textSize"
+            android:textColor="@color/colorPrimaryDark"
+            android:gravity="bottom"/>
 
+        <LinearLayout
+            style="@style/InLayoutPadding"
+            android:id="@+id/trailer_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:visibility="visible"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -135,6 +157,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
             android:paddingEnd="@dimen/margin_large"
             android:paddingStart="@dimen/margin_large"
             android:visibility="gone"/>

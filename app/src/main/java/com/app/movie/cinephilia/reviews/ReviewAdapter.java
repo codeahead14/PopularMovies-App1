@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.app.movie.cinephilia.R;
+import com.app.movie.cinephilia.trailers.MovieTrailerModel;
 
 import java.util.ArrayList;
 
