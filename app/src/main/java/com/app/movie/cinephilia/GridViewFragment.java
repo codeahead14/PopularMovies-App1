@@ -6,7 +6,9 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -53,6 +55,15 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     private ArrayList<MovieModel> mGridData;
     private static final int LOADER_FAVOURITE_MOVIES_ID = 1001;
     private static final String MOVIES_TAG = "MovieModel";
+    private GridView mGridView;
+    private Bundle bundle;
+
+    public static final String BUNDLE_TAG = "MoviesList";
+
+    public interface Callback {
+        public void onItemSelected(MovieModel item);
+        public void defaultItemSelected(MovieModel item);
+    }
 
     public GridViewFragment() {
     }
@@ -62,15 +73,21 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
         super.onCreate(savedInstanceState);
         mGridData = null;
         mGridAdapter = new GridViewAdapter(getActivity(), R.layout.grid_item_layout, new ArrayList<MovieModel>());
-        /*if (savedInstanceState != null) {
+        if (savedInstanceState != null) {
             mGridData = savedInstanceState.getParcelableArrayList(MOVIES_TAG);
-        }*/
-        /*if (mGridData == null) {
+        }
+        if (mGridData == null) {
             updateGrid();
         } else {
             mGridAdapter.updateValues(mGridData);
-        }*/
+        }
 
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
@@ -116,6 +133,7 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     public void MovieDataFetchFinished(ArrayList<MovieModel> movies){
         mGridAdapter.clear();
         mGridAdapter.updateValues(movies);
+        ((Callback)getActivity()).defaultItemSelected(movies.get(0));
     }
 
     @Override
@@ -123,29 +141,9 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
                              Bundle savedInstanceState) {
         //Log.v(TAG,"On Createview");
         View rootView = (View) inflater.inflate(R.layout.fragment_main, container, false);
-        GridView mGridView = (GridView) rootView.findViewById(R.id.gridview);
+        mGridView = (GridView) rootView.findViewById(R.id.gridview);
         mGridView.setEmptyView(rootView.findViewById(R.id.emptyView));
-        mGridView.setAdapter(mGridAdapter);
-        Log.v(TAG, "view count: " + mGridAdapter.getCount());
-        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                /*if (getActivity().findViewById(R.id.container)  != null) {
-                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                    fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-//                    Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_details);
-//                    if (fragment == null) {
-                    MovieModel movie = (MovieModel) parent.getAdapter().getItem(position);
-                    Fragment fragment = DetailsFragment.newInstance(movie);
-                    fragmentManager.beginTransaction().add(R.id.container, fragment).commit();
-                } else {*/
-                    MovieModel item = mGridAdapter.getItem(position);
-                    Log.v(TAG, "Movie at position: " + position + " is " + item.getTitle());
-                    Intent intent = new Intent(getActivity(), DetailsActivity.class).putExtra(Intent.EXTRA_TEXT, item);
-                    startActivity(intent);
-                //}
-            }
-        });
+
         return rootView;
     }
 
@@ -180,5 +178,37 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+    Parcelable state;
+
+    @Override
+    public void onPause(){
+        state = mGridView.onSaveInstanceState();
+        Log.v(TAG,"on pause");
+        super.onPause();
+    }
+
+    @Override
+    public void onViewCreated(final View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mGridView.setAdapter(mGridAdapter);
+        Log.v(TAG, "view count: " + mGridAdapter.getCount());
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                MovieModel item = mGridAdapter.getItem(position);
+                //bundle.putParcelable(BUNDLE_TAG,item);
+                ((Callback)getActivity()).onItemSelected(item);
+                //Intent intent = new Intent(getActivity(), DetailsActivity.class).putExtra(Intent.EXTRA_TEXT, item);
+                //startActivity(intent);
+            }
+        });
+
+        // Restore previous state (including selected item index and scroll position)
+        if(state != null) {
+            Log.d(TAG, "trying to restore listview state..");
+            mGridView.onRestoreInstanceState(state);
+        }
     }
 }

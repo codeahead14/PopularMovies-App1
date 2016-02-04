@@ -20,11 +20,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GridViewFragment.Callback {
 
     private static final String msg = "Android: ";
+    private static final String DETAILFRAGMENT_TAG = "DFTAG";
     private Utility utility;
     private static View parentLayout;
+    public static boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,17 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        if (findViewById(R.id.detail_container) != null) {
+            mTwoPane = true;
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.detail_container, new DetailsFragment(), DETAILFRAGMENT_TAG)
+                        .commit();
+            }
+        } else {
+            mTwoPane = false;
+        }
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -65,6 +78,45 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void defaultItemSelected(MovieModel item){
+        if(mTwoPane){
+            onItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onItemSelected(MovieModel item){
+        if (mTwoPane) {
+            Bundle args = new Bundle();
+            args.putParcelable(Intent.EXTRA_TEXT, item);
+
+            DetailsFragment fragment = new DetailsFragment();
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.detail_container, fragment, DETAILFRAGMENT_TAG)
+                    .commit();
+        } else {
+            Intent intent = new Intent(this, DetailsActivity.class);
+            intent.putExtra(Intent.EXTRA_TEXT, item);
+            startActivity(intent);
+        }
+
+        /*if(mTwoPane){
+            DetailsFragment fragment = new DetailsFragment();
+            fragment.setArguments(item);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.detail_container, fragment, DETAILFRAGMENT_TAG)
+                    .commit();
+        }else{
+            Intent intent = new Intent(this,DetailsActivity.class).putExtras(item);
+            startActivity(intent);
+        }*/
+    }
+
     /** Called when the activity is about to become visible. */
     @Override
     protected void onStart() {

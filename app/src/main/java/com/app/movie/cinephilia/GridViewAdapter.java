@@ -57,7 +57,7 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
     @Override
     public void clear(){
         this.mGridData.clear();
-        notifyDataSetChanged();
+        //notifyDataSetChanged();
     }
 
     @Override
@@ -78,6 +78,8 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
         holder.textView.setText(item.getTitle());
         Picasso.with(mContext)
                 .load(item.getPosterUrl())
+                .fit()
+                .centerCrop()
                 .placeholder(R.drawable.loading)
                 .error(R.drawable.imagenotfound)
                 .into(holder.imageView);

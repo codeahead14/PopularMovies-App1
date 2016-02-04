@@ -25,23 +25,20 @@ public class DetailsActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details_view);
-        /*Toolbar toolbar = (Toolbar)findViewById(R.id.detailstoolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);*/
-        //collapsingToolbar.setTitle("Details Activity");
         if (savedInstanceState == null) {
+            //Bundle arguments = getIntent().getExtras();
+            //arguments.putParcelable(DetailsFragment.ARG_MOVIE, arguments.getBundle(GridViewFragment.BUNDLE_TAG));
+
+            //DetailsFragment fragment = new DetailsFragment();
+            //fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new DetailsFragment())
+                    .add(R.id.detail_container, new DetailsFragment())
                     .commit();
         }
     }
 
     @Override
     public void setTitleandBackDrop(String title, String backDrop){
-        /*collapsingToolbar.setTitle(title);
-        imageView = (ImageView) findViewById(R.id.backdrop);
-        Picasso.with(this).load(backDrop).into(imageView);*/
         Log.v("Hi","There");
     }
 }

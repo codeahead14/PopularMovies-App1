@@ -64,7 +64,7 @@ public class DetailsFragment extends Fragment {
     private ImageView imageView;
     private ContentResolver resolver;
 
-    private static final String ARG_MOVIE = "movieFragment";
+    public static final String ARG_MOVIE = "movieFragment";
 
     // Public members
     public static int mMovieId;
@@ -88,6 +88,7 @@ public class DetailsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        Log.v(TAG, "On create");
 
         intent = getActivity().getIntent();
         if(intent!=null && intent.hasExtra(Intent.EXTRA_TEXT)) {
@@ -97,11 +98,27 @@ public class DetailsFragment extends Fragment {
             // Initializing the ReviewAdapter over listview
             mMovieId = movie.getId();
             FetchMovieElements(mMovieId);
+        }else{
+            Bundle arguments = getArguments();
+            if(arguments!=null) {
+                Log.v(TAG,"Arguments !null");
+                movie = arguments.getParcelable(Intent.EXTRA_TEXT);
+                mMovieId = movie.getId();
+                //FetchMovieElements(mMovieId);
+            }
         }
+
+        /*Bundle arguments = getArguments();
+        if(arguments!=null){
+            Log.v(TAG,"arguments are null");
+            movie = arguments.getParcelable(GridViewFragment.BUNDLE_TAG);
+            mMovieId = movie.getId();
+            FetchMovieElements(mMovieId);
+        }*/
     }
 
 
-    @Override
+    /*@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
@@ -109,29 +126,31 @@ public class DetailsFragment extends Fragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString());
         }
-    }
+    }*/
 
     public void FetchMovieElements(int movieId){
         // Fetch Review data
         mReviewData = new ArrayList<>();
         mReviewAdapter = new ReviewAdapter(getActivity(), R.layout.list_item_review, mReviewData);
         FetchReviewTask reviewTask = new FetchReviewTask(getActivity(), mReviewAdapter);
-        reviewTask.execute(Integer.toString(movie.getId()));
+        reviewTask.execute(Integer.toString(movieId));
 
         // Fetch Trailer data
         mTrailerAdapter = new TrailerAdapter(getActivity(),R.layout.list_item_trailer,new ArrayList<MovieTrailerModel>());
         FetchTrailerTask trailerTask = new FetchTrailerTask(getActivity(), mTrailerAdapter);
-        trailerTask.execute(Integer.toString(mMovieId));
+        trailerTask.execute(Integer.toString(movieId));
     }
 
     @Override
     public void onResume(){
+        Log.v(TAG, "On Resume");
         super.onResume();
         BusProvider.getInstance().register(this);
     }
 
     @Override
     public void onPause(){
+        Log.v(TAG,"On Pause");
         super.onPause();
         BusProvider.getInstance().unregister(this);
     }
@@ -180,6 +199,7 @@ public class DetailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.v(TAG,"On create view");
         final View rootView = inflater.inflate(R.layout.fragment_detail_layout, container, false);
         setupWidgets(rootView);
 
@@ -188,7 +208,7 @@ public class DetailsFragment extends Fragment {
         mButton.setImageResource(R.drawable.ic_arrow_drop_down_black_24dp);
 
         if(mHasData){
-            mDetailsActivityCallback.setTitleandBackDrop(movie.getTitle(), movie.getBackdropUrl());
+            //mDetailsActivityCallback.setTitleandBackDrop(movie.getTitle(), movie.getBackdropUrl());
             mLinearLayoutReview = (LinearLayout)rootView.findViewById(R.id.review_list);
             mLinearLayoutTrailer = (LinearLayout)rootView.findViewById(R.id.trailer_list);
 
@@ -284,10 +304,12 @@ public class DetailsFragment extends Fragment {
     }
 
     private void setupWidgets(View rootView) {
-        toolbar = (Toolbar)rootView.findViewById(R.id.detailstoolbar);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        collapsingToolbar = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsing_toolbar);
+        if(MainActivity.mTwoPane) {
+            toolbar = (Toolbar) rootView.findViewById(R.id.detailstoolbar);
+            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            collapsingToolbar = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsing_toolbar);
+        }
     }
 
     @Subscribe

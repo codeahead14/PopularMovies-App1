@@ -7,10 +7,9 @@
 
     <ImageView
         android:id="@+id/grid_item_image"
-        android:layout_width="wrap_content"
-        android:layout_height="300dp"
-        android:adjustViewBounds="true"
-        android:scaleType="fitXY"/>
+        android:layout_width="match_parent"
+        android:layout_height="277dp"
+        android:adjustViewBounds="true"/>
 
     <TextView
         android:id="@+id/grid_item_text"
