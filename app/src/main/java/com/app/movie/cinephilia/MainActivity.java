@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements GridViewFragment.
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
     private Utility utility;
     private static View parentLayout;
-    public static boolean mTwoPane;
+    public static boolean mTwoPane = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,18 +103,6 @@ public class MainActivity extends AppCompatActivity implements GridViewFragment.
             intent.putExtra(Intent.EXTRA_TEXT, item);
             startActivity(intent);
         }
-
-        /*if(mTwoPane){
-            DetailsFragment fragment = new DetailsFragment();
-            fragment.setArguments(item);
-
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.detail_container, fragment, DETAILFRAGMENT_TAG)
-                    .commit();
-        }else{
-            Intent intent = new Intent(this,DetailsActivity.class).putExtras(item);
-            startActivity(intent);
-        }*/
     }
 
     /** Called when the activity is about to become visible. */

@@ -9,9 +9,8 @@
 
 
     <RelativeLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="0.5">
+        android:layout_width="@dimen/grid_width"
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/trailerImg"
@@ -33,11 +32,12 @@
         android:id="@+id/trailerName"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.5"
+        android:layout_weight="1"
         android:fontFamily="sans-serif-regular"
         android:textColor="@color/black"
-        android:textSize="@dimen/content_textSize"
+        android:textSize="@dimen/info_textSize"
         android:gravity="start"
+        android:paddingLeft="@dimen/margin_default"
+        android:paddingStart="@dimen/margin_default"
         android:layout_gravity="end|center"/>
-
 </LinearLayout>

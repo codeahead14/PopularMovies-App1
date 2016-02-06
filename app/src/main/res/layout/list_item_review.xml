@@ -3,7 +3,6 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:divider="@drawable/view_separator"
-    android:dividerPadding="@dimen/margin_inline"
     android:paddingTop="@dimen/margin_default"
     android:paddingBottom="@dimen/margin_default"
     android:showDividers="end">
@@ -17,6 +16,8 @@
     <TextView
         android:id="@+id/text_view_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/margin_inline"
+        android:paddingBottom="@dimen/margin_inline"/>
 
 </LinearLayout>

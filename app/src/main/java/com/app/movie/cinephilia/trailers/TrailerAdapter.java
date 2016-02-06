@@ -12,7 +12,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.app.movie.cinephilia.DetailsFragment;
+import com.app.movie.cinephilia.MovieModel;
 import com.app.movie.cinephilia.R;
+import com.app.movie.cinephilia.Utility;
 import com.app.movie.cinephilia.reviews.MovieReviewModel;
 import com.squareup.picasso.Picasso;
 
@@ -24,6 +26,8 @@ import java.util.ArrayList;
 public class TrailerAdapter extends ArrayAdapter<MovieTrailerModel> {
     private ArrayList<MovieTrailerModel> mTrailerData = new ArrayList<>();
     private Context mContext;
+    private ViewHolder viewHolder;
+    MovieTrailerModel movieTrailerModel;
 
     public TrailerAdapter(Context context, int layoutResourceId, ArrayList<MovieTrailerModel> trailers){
         super(context, layoutResourceId, trailers);
@@ -42,8 +46,12 @@ public class TrailerAdapter extends ArrayAdapter<MovieTrailerModel> {
     }
 
     @Override
+    public MovieTrailerModel getItem(int position) {
+        return mTrailerData.get(position);
+    }
+
+    @Override
     public View getView(int pos, View convertView, ViewGroup parent){
-        ViewHolder viewHolder;
         String movieId = Integer.toString(DetailsFragment.mMovieId);
 
         if(convertView == null){
@@ -56,7 +64,7 @@ public class TrailerAdapter extends ArrayAdapter<MovieTrailerModel> {
         }else
             viewHolder = (ViewHolder)convertView.getTag();
 
-        MovieTrailerModel movieTrailerModel = mTrailerData.get(pos);
+        movieTrailerModel = mTrailerData.get(pos);
         Log.v("ReviewAdapter", movieTrailerModel.mName);
         viewHolder.name.setText(movieTrailerModel.mName);
         final String BASE_URL = "http://img.youtube.com/vi/";
@@ -66,6 +74,7 @@ public class TrailerAdapter extends ArrayAdapter<MovieTrailerModel> {
                 .load(url)
                 .resize(300,200)
                 .centerCrop()
+                .placeholder(R.drawable.imagenotfound)
                 .into(viewHolder.trailerImg);
 
         final String trailerUrl="https://www.youtube.com/watch?v="+movieTrailerModel.mKey;

@@ -129,6 +129,13 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
         updateGrid();
     }
 
+    Parcelable state;
+    @Override
+    public void onPause(){
+        state = mGridView.onSaveInstanceState();
+        super.onPause();
+    }
+
     @Override
     public void MovieDataFetchFinished(ArrayList<MovieModel> movies){
         mGridAdapter.clear();
@@ -145,6 +152,29 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
         mGridView.setEmptyView(rootView.findViewById(R.id.emptyView));
 
         return rootView;
+    }
+
+    @Override
+    public void onViewCreated(final View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mGridView.setAdapter(mGridAdapter);
+        Log.v(TAG, "view count: " + mGridAdapter.getCount());
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                MovieModel item = mGridAdapter.getItem(position);
+                //bundle.putParcelable(BUNDLE_TAG,item);
+                ((Callback) getActivity()).onItemSelected(item);
+                //Intent intent = new Intent(getActivity(), DetailsActivity.class).putExtra(Intent.EXTRA_TEXT, item);
+                //startActivity(intent);
+            }
+        });
+
+        // Restore previous state (including selected item index and scroll position)
+        if(state != null) {
+            Log.d(TAG, "trying to restore listview state..");
+            mGridView.onRestoreInstanceState(state);
+        }
     }
 
     @Override
@@ -178,37 +208,5 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-    }
-
-    Parcelable state;
-
-    @Override
-    public void onPause(){
-        state = mGridView.onSaveInstanceState();
-        Log.v(TAG,"on pause");
-        super.onPause();
-    }
-
-    @Override
-    public void onViewCreated(final View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        mGridView.setAdapter(mGridAdapter);
-        Log.v(TAG, "view count: " + mGridAdapter.getCount());
-        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                MovieModel item = mGridAdapter.getItem(position);
-                //bundle.putParcelable(BUNDLE_TAG,item);
-                ((Callback)getActivity()).onItemSelected(item);
-                //Intent intent = new Intent(getActivity(), DetailsActivity.class).putExtra(Intent.EXTRA_TEXT, item);
-                //startActivity(intent);
-            }
-        });
-
-        // Restore previous state (including selected item index and scroll position)
-        if(state != null) {
-            Log.d(TAG, "trying to restore listview state..");
-            mGridView.onRestoreInstanceState(state);
-        }
     }
 }
