@@ -56,7 +56,6 @@ public class DetailsFragment extends Fragment {
     private ReviewAdapter mReviewAdapter;
     private TrailerAdapter mTrailerAdapter;
     private LinearLayout mLinearLayoutReview, mLinearLayoutTrailer;
-    private UpdateToolBarWidget mDetailsActivityCallback;
     private static Toolbar toolbar;
     private static CollapsingToolbarLayout collapsingToolbar;
     private static FloatingActionButton fab;
@@ -64,15 +63,11 @@ public class DetailsFragment extends Fragment {
     private ImageView imageView;
     private ContentResolver resolver;
     private String youtubeId, shareYoutube;
-
-    public static final String ARG_MOVIE = "movieFragment";
+    private ShareActionProvider mShareActionProvider;
 
     // Public members
+    public static final String ARG_MOVIE = "movieFragment";
     public static int mMovieId;
-
-    public interface UpdateToolBarWidget {
-        void setTitleandBackDrop(String title, String backDropPath);
-    }
 
     public DetailsFragment() {
     }
@@ -94,9 +89,7 @@ public class DetailsFragment extends Fragment {
         intent = getActivity().getIntent();
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             mHasData = true;
-            // Using Parcelable to get parcel object
             movie = intent.getExtras().getParcelable(Intent.EXTRA_TEXT);
-            // Initializing the ReviewAdapter over listview
             mMovieId = movie.getId();
             FetchMovieElements(mMovieId);
         } else {
@@ -124,7 +117,6 @@ public class DetailsFragment extends Fragment {
         super.onPause();
         BusProvider.getInstance().unregister(this);
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -220,18 +212,15 @@ public class DetailsFragment extends Fragment {
         // Locate MenuItem with ShareActionProvider
         MenuItem item = menu.findItem(R.id.menu_item_share);
         // Fetch and store ShareActionProvider
-        ShareActionProvider mShareActionProvider =
-                (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
         if (mShareActionProvider != null) {
-            mShareActionProvider.setShareIntent(createShareForecastIntent());
+            mShareActionProvider.setShareIntent(createShareUrlIntent(null));
         } else {
             Log.d(TAG, "Share Action Provider is null?");
         }
     }
 
     public void FetchMovieElements(int movieId) {
-        //Fetch Data tasks executed only if there is connectivity
-        //Otherwise display default view
         mReviewData = new ArrayList<>();
         mReviewAdapter = new ReviewAdapter(getActivity(), R.layout.list_item_review, mReviewData);
         mTrailerAdapter = new TrailerAdapter(getActivity(), R.layout.list_item_trailer, new ArrayList<MovieTrailerModel>());
@@ -287,7 +276,7 @@ public class DetailsFragment extends Fragment {
     }
 
 
-    private Intent createShareForecastIntent() {
+    private Intent createShareUrlIntent(String videoLink) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -320,14 +309,16 @@ public class DetailsFragment extends Fragment {
                     mLinearLayoutReview.addView(item);
                 }
             } else if (event.getName().equals("FetchTrailerTask")) {
-                youtubeId = mTrailerAdapter.getItem(0).mKey;
-                mHasTrailers=true;
-                for (int iter = 0; iter < mTrailerAdapter.getCount(); iter++) {
-                    View item = mTrailerAdapter.getView(iter, null, null);
-                    mLinearLayoutTrailer.addView(item);
+                if(mTrailerAdapter.getCount()>0) {
+                    mHasTrailers=true;
+                    youtubeId = mTrailerAdapter.getItem(0).mKey;
+                    if (mShareActionProvider != null)
+                        mShareActionProvider.setShareIntent(createShareUrlIntent(youtubeId));
+                    for (int iter = 0; iter < mTrailerAdapter.getCount(); iter++) {
+                        View item = mTrailerAdapter.getView(iter, null, null);
+                        mLinearLayoutTrailer.addView(item);
+                    }
                 }
-                //youtubeId = mTrailerAdapter.getItem(0).mKey;
-                //Log.v(TAG,"youtube id: "+youtubeId);
             }
         }
     }

@@ -74,7 +74,6 @@ public class TrailerAdapter extends ArrayAdapter<MovieTrailerModel> {
                 .load(url)
                 .resize(300,200)
                 .centerCrop()
-                .placeholder(R.drawable.imagenotfound)
                 .into(viewHolder.trailerImg);
 
         final String trailerUrl="https://www.youtube.com/watch?v="+movieTrailerModel.mKey;

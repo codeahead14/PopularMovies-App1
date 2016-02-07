@@ -8,7 +8,7 @@
     <ImageView
         android:id="@+id/grid_item_image"
         android:layout_width="match_parent"
-        android:layout_height="277dp"
+        android:layout_height="@dimen/poster_height"
         android:adjustViewBounds="true"/>
 
     <TextView

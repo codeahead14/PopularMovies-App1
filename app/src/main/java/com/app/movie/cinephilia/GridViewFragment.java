@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -61,8 +62,8 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     public static final String BUNDLE_TAG = "MoviesList";
 
     public interface Callback {
-        public void onItemSelected(MovieModel item);
-        public void defaultItemSelected(MovieModel item);
+        void onItemSelected(MovieModel item);
+        void defaultItemSelected(MovieModel item);
     }
 
     public GridViewFragment() {
@@ -86,38 +87,6 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.gridviewfragment, menu);
-
-        // Adding Debugging using Stetho
-        Stetho.initialize(
-                Stetho.newInitializerBuilder(getActivity())
-                        .enableDumpapp(Stetho.defaultDumperPluginsProvider(getActivity()))
-                        .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(getActivity()))
-                        .build());
-    }
-
-    public void updateGrid(){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String order = sharedPreferences.getString("Sort",getString(R.string.pref_sort_order));
-
-        if(order.equals("Show Favorites")){
-            Log.v(TAG,"order: "+order);
-            getLoaderManager().restartLoader(LOADER_FAVOURITE_MOVIES_ID, null, this);
-        }else {
-            Log.v(TAG, "fetch order: " + order);
-            FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity(),this);
-            fetchMovieTask.execute(order);
-        }
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState){
         outState.putParcelableArrayList(MOVIES_TAG, mGridAdapter.getMovies());
         super.onSaveInstanceState(outState);
@@ -137,19 +106,43 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void MovieDataFetchFinished(ArrayList<MovieModel> movies){
-        mGridAdapter.clear();
-        mGridAdapter.updateValues(movies);
-        ((Callback)getActivity()).defaultItemSelected(movies.get(0));
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.gridviewfragment, menu);
+
+        // Adding Debugging using Stetho
+        Stetho.initialize(
+                Stetho.newInitializerBuilder(getActivity())
+                        .enableDumpapp(Stetho.defaultDumperPluginsProvider(getActivity()))
+                        .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(getActivity()))
+                        .build());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        //Log.v(TAG,"On Createview");
         View rootView = (View) inflater.inflate(R.layout.fragment_main, container, false);
         mGridView = (GridView) rootView.findViewById(R.id.gridview);
         mGridView.setEmptyView(rootView.findViewById(R.id.emptyView));
+
+        mGridView.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        final int width = mGridView.getWidth();
+                        int numCol = (int) Math.round((double)width/(double)getResources()
+                                                            .getDimensionPixelSize(R.dimen.poster_width));
+                        Log.v(TAG,"Num width: "+getResources()
+                                .getDimensionPixelSize(R.dimen.poster_width)+" "+width);
+                        mGridView.setNumColumns(numCol);
+                    }
+                }
+        );
 
         return rootView;
     }
@@ -163,19 +156,37 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 MovieModel item = mGridAdapter.getItem(position);
-                //bundle.putParcelable(BUNDLE_TAG,item);
                 ((Callback) getActivity()).onItemSelected(item);
-                //Intent intent = new Intent(getActivity(), DetailsActivity.class).putExtra(Intent.EXTRA_TEXT, item);
-                //startActivity(intent);
             }
         });
-
         // Restore previous state (including selected item index and scroll position)
         if(state != null) {
-            Log.d(TAG, "trying to restore listview state..");
+            Log.d(TAG, "trying to restore gridview state..");
             mGridView.onRestoreInstanceState(state);
         }
     }
+
+    public void updateGrid(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String order = sharedPreferences.getString("Sort",getString(R.string.pref_sort_order));
+
+        if(order.equals("Show Favorites")){
+            Log.v(TAG,"order: "+order);
+            getLoaderManager().restartLoader(LOADER_FAVOURITE_MOVIES_ID, null, this);
+        }else {
+            Log.v(TAG, "fetch order: " + order);
+            FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity(),this);
+            fetchMovieTask.execute(order);
+        }
+    }
+
+    @Override
+    public void MovieDataFetchFinished(ArrayList<MovieModel> movies){
+        mGridAdapter.clear();
+        mGridAdapter.updateValues(movies);
+        ((Callback)getActivity()).defaultItemSelected(movies.get(0));
+    }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

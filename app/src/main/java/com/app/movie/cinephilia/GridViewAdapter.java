@@ -13,6 +13,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -63,7 +65,7 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
     @Override
     public View getView(int pos, View counterView, ViewGroup parent){
         View row = counterView;
-        ViewHolder holder;
+        final ViewHolder holder;
         if(row==null){
             LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
@@ -75,14 +77,39 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
             holder = (ViewHolder)row.getTag();
 
         MovieModel item = getItem(pos);
+        final String url = item.getPosterUrl();
         holder.textView.setText(item.getTitle());
         Picasso.with(mContext)
-                .load(item.getPosterUrl())
+                .load(url)
                 .fit()
                 .centerCrop()
+                .networkPolicy(NetworkPolicy.OFFLINE)
                 .placeholder(R.drawable.loading)
-                .error(R.drawable.imagenotfound)
-                .into(holder.imageView);
+                .into(holder.imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                    }
+
+                    @Override
+                    public void onError() {
+                        Picasso
+                                .with(mContext)
+                                .load(url)
+                                .error(R.drawable.imagenotfound)
+                                .fit()
+                                .centerCrop()
+                                .into(holder.imageView, new Callback() {
+                                    @Override
+                                    public void onSuccess() {
+                                    }
+
+                                    @Override
+                                    public void onError() {
+                                        Log.v("Error Loading Images", "'");
+                                    }
+                                });
+                    }
+                });
         return row;
     }
 

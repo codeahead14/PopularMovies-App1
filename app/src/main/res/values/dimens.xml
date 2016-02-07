@@ -24,4 +24,8 @@
     <!-- Details Fragment parameters -->
     <dimen name="details_backdrop_height">220dp</dimen>
 
+    <!-- Grid Paraeters -->
+    <dimen name="poster_width">185dp</dimen>
+    <dimen name="poster_height">277dp</dimen>
+
 </resources>
