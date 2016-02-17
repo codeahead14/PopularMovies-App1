@@ -5,4 +5,4 @@ Includes writing of Favorite Movies Data to DataBase (powered by SQLite - Androi
 To use the App - Enter your API Key in the Strings resources with key "api_key" in the application
 
 # Demo
-To be Updated Soon
+Demo 1
