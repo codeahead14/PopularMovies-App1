@@ -7,4 +7,4 @@ To use the App - Enter your API Key in the Strings resources with key "api_key" 
 # Demo
 Demo 1 - https://www.youtube.com/watch?v=PuFmSnYZ7iw
 
-[!Alt text](https://github.com/codeahead14/PopularMoviesApp/blob/FinalMoviesApp/GM_20160422_24306.gif)
+![Alt text](https://github.com/codeahead14/PopularMoviesApp/blob/FinalMoviesApp/GM_20160422_24306.gif)
