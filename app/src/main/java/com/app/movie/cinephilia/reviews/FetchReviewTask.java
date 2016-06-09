@@ -31,38 +31,33 @@ public class FetchReviewTask extends AsyncTask<String, Void, ArrayList<MovieRevi
 
     Activity mContext;
     ReviewAdapter mReviewsAdapter;
-    //OnReviewDataFetchFinished onReviewDataFetchFinished;
     private ProgressDialog progress;
 
     private final String LOG_TAG = FetchReviewTask.class.getSimpleName();
 
 
-    public FetchReviewTask(Activity context, ReviewAdapter adapter){ //, OnReviewDataFetchFinished onReviewDataFetchFinished){
+    public FetchReviewTask(Activity context, ReviewAdapter adapter){
         this.mContext = context;
         this.mReviewsAdapter = adapter;
-        //this.onReviewDataFetchFinished = onReviewDataFetchFinished;
     }
 
     @Override
     protected void onPreExecute(){
-        progress = new ProgressDialog(mContext);
+        /*progress = new ProgressDialog(mContext);
         progress.setMessage("Loading Data");
         progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progress.setIndeterminate(true);
         progress.setCancelable(false);
-        progress.show();
+        progress.show();*/
     }
 
     @Override
     protected ArrayList<MovieReviewModel> doInBackground(String... params) {
 
         String movieId;
-
-        // If there's no sortby param
         if (params.length == 0) {
             return null;
         }
-
         movieId = params[0];
 
         // These two need to be declared outside the try/catch
@@ -195,6 +190,6 @@ public class FetchReviewTask extends AsyncTask<String, Void, ArrayList<MovieRevi
         //onReviewDataFetchFinished.reviewDataFetchFinished(true);
         BusProvider.getInstance().post(new AsyncTaskResultEvent(true, "FetchReviewTask"));
         mReviewsAdapter.notifyDataSetChanged();
-        progress.dismiss();
+        //progress.dismiss();
     }
 }

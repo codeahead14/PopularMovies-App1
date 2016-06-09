@@ -119,7 +119,14 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
     }
 
     public void updateValues(ArrayList<MovieModel> elements) {
-        this.mGridData = elements;
+        //this.mGridData = elements;
+        int dataSize = mGridData.size();
+        Log.v(TAG,"number of elements: "+dataSize);
+        for(MovieModel elem: elements){
+            Log.v(TAG,"Movie added: "+elem.getTitle());
+            mGridData.add(elem);
+        }
+        //this.mGridData.addAll(dataSize, elements);
         notifyDataSetChanged();
     }
 }

@@ -49,6 +49,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.app.movie.cinephilia.DetailsActivity" />
         </activity>
+        <activity
+            android:name=".CreditsActivity"
+            android:label="@string/credits_title"
+            android:parentActivityName=".DetailsActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.app.movie.cinephilia.DetailsActivity" />
+        </activity>
 
         <provider
             android:authorities="com.app.movie.cinephilia"

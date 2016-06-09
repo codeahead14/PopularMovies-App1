@@ -43,12 +43,12 @@ public class FetchTrailerTask extends AsyncTask<String, Void, ArrayList<MovieTra
 
     @Override
     protected void onPreExecute(){
-        progress = new ProgressDialog(mContext);
+        /*progress = new ProgressDialog(mContext);
         progress.setMessage("Loading Data");
         progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progress.setIndeterminate(true);
         progress.setCancelable(false);
-        progress.show();
+        progress.show();*/
     }
 
     @Override
@@ -193,6 +193,6 @@ public class FetchTrailerTask extends AsyncTask<String, Void, ArrayList<MovieTra
         }
         BusProvider.getInstance().post(new AsyncTaskResultEvent(true, "FetchTrailerTask"));
         mTrailersAdapter.notifyDataSetChanged();
-        progress.dismiss();
+        //progress.dismiss();
     }
 }

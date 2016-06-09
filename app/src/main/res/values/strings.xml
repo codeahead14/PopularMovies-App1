@@ -1,9 +1,9 @@
 <resources>
     <!-- Enter Your API Key -->
-    <string name="api_key">ENTER THE API KEY</string>
+    <string name="api_key">f7097986478ba5bd9b98f5167305fcbd</string>
 
     <!-- String resources for the Application -->
-    <string name="app_name">CinePhilia</string>
+    <string name="app_name">Cinephilia</string>
     <string name="action_settings">Settings</string>
     <string name="refresh_button">Refresh</string>
     <string name="sort_order">Sort</string>
@@ -26,7 +26,10 @@
     <string name="pref_sort_order">"Most Popular"</string>
     <string name="full_image_desc">This is full screen image of the movie </string>
     <string name="notOnline">Not Connected to the Internet</string>
-    <string name="empty">Nothing to Show Right Now</string>
+    <string name="empty">Check Your Internet Connection</string>
     <string name="imageDescription">Placeholder for Image Content Description</string>
+
+    <string name="movie_credits">View Cast and Crew Details</string>
+    <string name="credits_title">Movie Cast</string>
 
 </resources>

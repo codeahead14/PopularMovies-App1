@@ -13,6 +13,7 @@
     <dimen name="title_size">25sp</dimen>
     <dimen name="info_textSize">20sp</dimen>
     <dimen name="content_textSize">15sp</dimen>
+    <dimen name="inAppTitle_textSize">14sp</dimen>
 
     <!-- margins -->
     <dimen name="margin_fab">16dp</dimen>
@@ -26,6 +27,6 @@
 
     <!-- Grid Paraeters -->
     <dimen name="poster_width">185dp</dimen>
-    <dimen name="poster_height">277dp</dimen>
+    <dimen name="poster_height">260dp</dimen>
 
 </resources>

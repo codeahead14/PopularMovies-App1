@@ -9,16 +9,28 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.IdRes;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.roughike.bottombar.BottomBar;
+import com.roughike.bottombar.OnMenuTabClickListener;
 
 public class MainActivity extends AppCompatActivity implements GridViewFragment.Callback {
 
@@ -27,16 +39,34 @@ public class MainActivity extends AppCompatActivity implements GridViewFragment.
     private Utility utility;
     private static View parentLayout;
     public static boolean mTwoPane = false;
+    private Context context;
+    private BottomBar mBottomBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context = this;
         parentLayout = findViewById(R.id.container);
         PreferenceManager.setDefaultValues(this, R.xml.user_preference, false);
+
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+
+        // Get the ViewPager and set it's PagerAdapter so that it can display items
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        MovieFragmentPagerAdapter movieFragmentPagerAdapter = new MovieFragmentPagerAdapter(
+                getSupportFragmentManager(), MainActivity.this);
+        viewPager.setAdapter(movieFragmentPagerAdapter);
+
+        // Give the TabLayout the ViewPager
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
+        tabLayout.setupWithViewPager(viewPager);
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+            TabLayout.Tab tab = tabLayout.getTabAt(i);
+            tab.setCustomView(movieFragmentPagerAdapter.getTabView(i));
+        }
 
         if (findViewById(R.id.detail_container) != null) {
             mTwoPane = true;
@@ -48,18 +78,33 @@ public class MainActivity extends AppCompatActivity implements GridViewFragment.
         } else {
             mTwoPane = false;
         }
-
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new GridViewFragment())
-                    .commit();
-        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        //getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        getMenuInflater().inflate(R.menu.menu_search_movie, menu);
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Toast.makeText(context,"Searching",Toast.LENGTH_SHORT).show();
+                // Reset SearchView
+                searchView.clearFocus();
+                searchView.setQuery("", false);
+                searchView.setIconified(true);
+                searchItem.collapseActionView();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
         return true;
     }
 

@@ -52,7 +52,6 @@ public class TrailerAdapter extends ArrayAdapter<MovieTrailerModel> {
 
     @Override
     public View getView(int pos, View convertView, ViewGroup parent){
-        String movieId = Integer.toString(DetailsFragment.mMovieId);
 
         if(convertView == null){
             viewHolder = new ViewHolder();
@@ -65,15 +64,14 @@ public class TrailerAdapter extends ArrayAdapter<MovieTrailerModel> {
             viewHolder = (ViewHolder)convertView.getTag();
 
         movieTrailerModel = mTrailerData.get(pos);
-        Log.v("ReviewAdapter", movieTrailerModel.mName);
         viewHolder.name.setText(movieTrailerModel.mName);
         final String BASE_URL = "http://img.youtube.com/vi/";
         final String url = BASE_URL + movieTrailerModel.mKey + "/0.jpg";
         Picasso
                 .with(mContext)
                 .load(url)
-                .resize(300,200)
-                .centerCrop()
+                .resize(720,400)
+                .centerInside()
                 .into(viewHolder.trailerImg);
 
         final String trailerUrl="https://www.youtube.com/watch?v="+movieTrailerModel.mKey;

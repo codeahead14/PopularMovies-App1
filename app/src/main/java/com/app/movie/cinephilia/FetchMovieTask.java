@@ -33,7 +33,10 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
     private Activity mActivity;
     private OnMovieDataFetchFinished fetchFinishedCallback;
 
-    private static final int PAGE_LIMIT = 2;
+    // Page Number for Endless Scrolling
+    private String pageNumber = "1";
+
+    private static final int PAGE_LIMIT = 1;
     public static final String TOTAL_PAGES_KEY = "total_pages";
     public static final String TOTAL_RESULTS_KEY = "total_results";
     public static final String RESULTS_KEY = "results";
@@ -47,6 +50,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
     public static final String PAGE_NUMBER_KEY = "page";
     public static final String RESULTS_kEY = "results";
     public static final String ID = "id";
+    //final AVLoadingIndicatorDialog dialog=new AVLoadingIndicatorDialog(this);
 
     private static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";
     private static final String GZIP_ENCODING = "gzip";
@@ -59,11 +63,12 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
     private static void requestDecompression(HttpURLConnection conn) {
         conn.setRequestProperty(HEADER_ACCEPT_ENCODING, GZIP_ENCODING);
     }
-    public ArrayList<MovieModel> getMovies(String sort_by) throws IOException{
+
+    public ArrayList<MovieModel> getMovies(String sort_by, String pageNum) throws IOException{
         String responseJSONStr;
         ArrayList<MovieModel> movies = new ArrayList<>();
 
-        for(int i=1; i<=PAGE_LIMIT; i++) {
+        //for(int i=1; i<=PAGE_LIMIT; i++) {
             Uri.Builder builder = new Uri.Builder();
             builder.scheme("http")
                     .authority("api.themoviedb.org")
@@ -71,7 +76,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
                     .appendPath("discover")
                     .appendPath("movie")
                     .appendQueryParameter("sort_by", sort_by)
-                    .appendQueryParameter("page", String.valueOf(i))
+                    .appendQueryParameter("page", pageNum)
                     .appendQueryParameter("api_key", mActivity.getString(R.string.api_key));
             inp_url = builder.build().toString();
 
@@ -109,19 +114,18 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
                 Log.e(LOG_TAG2, e.getMessage(), e);
                 e.printStackTrace();
             }
-        }
+        //}
         return movies;
     }
 
     @Override
     protected void onPreExecute(){
-        progress = new ProgressDialog(mActivity);
+        /*progress = new ProgressDialog(mActivity);
         progress.setMessage("Loading Data");
         progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progress.setIndeterminate(true);
-        progress.setCancelable(false);
-        progress.show();
-        java.lang.Thread.dumpStack();
+        progress.setCancelable(false);*/
+        //progress.show();
     }
 
     protected ArrayList<MovieModel> doInBackground(String... params) {
@@ -131,7 +135,9 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
                 sort_by = "popularity.desc";
             else if(params[0].equals("Highest Rated"))
                 sort_by = "vote_average.asc";
-            return getMovies(sort_by);
+
+            pageNumber = params[1];
+            return getMovies(sort_by, pageNumber);
         } catch (IOException e) {
             JSONResponse = null;
             Log.d(LOG_TAG2, e.getLocalizedMessage());
@@ -158,7 +164,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
                 mGridAdapter.add(elem);
             }*/
         }
-        progress.dismiss();
+        //progress.dismiss();
     }
 
     private ArrayList<MovieModel> parseResult(String result) throws JSONException {

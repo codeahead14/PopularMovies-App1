@@ -1,19 +1,29 @@
 package com.app.movie.cinephilia;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.os.Build;
+import android.os.Handler;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.FloatingActionButton;
+//import android.support.design.widget.FloatingActionButton;
+import com.app.movie.cinephilia.CastandCrew.CreditsAdapter;
+import com.app.movie.cinephilia.CastandCrew.FetchCreditsTask;
+import com.app.movie.cinephilia.CastandCrew.MovieCreditsModel;
+import com.github.clans.fab.FloatingActionButton;
+//import com.github.fab.sample.R;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.ShareActionProvider;
+//import android.support.v7.widget.ShareActionProvider;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +32,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -39,8 +52,11 @@ import com.app.movie.cinephilia.reviews.ReviewAdapter;
 import com.app.movie.cinephilia.trailers.FetchTrailerTask;
 import com.app.movie.cinephilia.trailers.MovieTrailerModel;
 import com.app.movie.cinephilia.trailers.TrailerAdapter;
+import com.github.clans.fab.FloatingActionMenu;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -49,35 +65,35 @@ import java.util.ArrayList;
  */
 public class DetailsFragment extends Fragment {
     private static final String TAG = DetailsFragment.class.getSimpleName();
-    private boolean mHasData, isExpanded = false, mHasTrailers=false;
+    private boolean mHasData, isExpanded = false, mHasTrailers=false, mHasCredits = false;
+    private String trailerUrl = "no URLs at the moment!";
     private Intent intent;
     private MovieModel movie;
     private ArrayList<MovieReviewModel> mReviewData;
+    private ArrayList<MovieCreditsModel> mCreditsData;
     private ReviewAdapter mReviewAdapter;
     private TrailerAdapter mTrailerAdapter;
+    private CreditsAdapter mCreditsAdapter;
     private LinearLayout mLinearLayoutReview, mLinearLayoutTrailer;
     private static Toolbar toolbar;
     private static CollapsingToolbarLayout collapsingToolbar;
-    private static FloatingActionButton fab;
-    private static ImageButton mButton;
     private ImageView imageView;
     private ContentResolver resolver;
     private String youtubeId, shareYoutube;
-    private ShareActionProvider mShareActionProvider;
+    private static Button mButton_Credits;
+    private AVLoadingIndicatorDialog dialog;
+
+    /* Floating Action Buttons - Using Clans Library */
+    private FloatingActionMenu menuRed;
+    private FloatingActionButton fab1;
+    private FloatingActionButton fab2;
+    private FloatingActionButton fab3;
 
     // Public members
     public static final String ARG_MOVIE = "movieFragment";
     public static int mMovieId;
 
     public DetailsFragment() {
-    }
-
-    public static DetailsFragment newInstance(MovieModel movie) {
-        DetailsFragment fragment = new DetailsFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(ARG_MOVIE, movie);
-        fragment.setArguments(bundle);
-        return fragment;
     }
 
     @Override
@@ -123,10 +139,16 @@ public class DetailsFragment extends Fragment {
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_detail_layout, container, false);
         setupWidgets(rootView);
+        dialog = new AVLoadingIndicatorDialog(getActivity(), rootView);
+        dialog.setMessage("Fetching Details.. Just for You!!");
+        dialog.show();
 
-        fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
-        mButton = (ImageButton) rootView.findViewById(R.id.show_review_button);
-        mButton.setImageResource(R.drawable.ic_arrow_drop_down_black_24dp);
+        menuRed = (FloatingActionMenu) rootView.findViewById(R.id.menu_red);
+        fab1 = (FloatingActionButton) rootView.findViewById(R.id.fab1);
+        fab2 = (FloatingActionButton) rootView.findViewById(R.id.fab2);
+        fab3 = (FloatingActionButton) rootView.findViewById(R.id.fab3);
+
+        mButton_Credits = (Button) rootView.findViewById(R.id.credits_button);
 
         if (mHasData) {
             mLinearLayoutReview = (LinearLayout) rootView.findViewById(R.id.review_list);
@@ -136,6 +158,20 @@ public class DetailsFragment extends Fragment {
                 Toast.makeText(getActivity(),"Unable to Fetch Trailers and Reviews!! No Connectivity!!",
                                                 Toast.LENGTH_LONG).show();
             }
+
+            mButton_Credits.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mHasCredits){
+                        Toast.makeText(getActivity(), "Credits Fetch Completed", Toast.LENGTH_SHORT).show();
+                        mCreditsData = mCreditsAdapter.getCreditsData();
+                        Intent intent = new Intent(getActivity(), CreditsActivity.class);
+                        intent.putExtra("CreditsData", mCreditsData);
+                        startActivity(intent);
+                        getActivity().overridePendingTransition(R.anim.slide_up_info, R.anim.no_change);
+                    }
+                }
+            });
 
             TextView titleTextView = (TextView) rootView.findViewById(R.id.text_view_title);
             titleTextView.setText(movie.getTitle());
@@ -168,16 +204,90 @@ public class DetailsFragment extends Fragment {
             TextView voteCountTextView = (TextView) rootView.findViewById(R.id.text_view_vote_count);
             voteCountTextView.setText(getString(R.string.voteCount) + ": " + movie.getVoteCount());
 
+            final TextView trailerTitle = (TextView) rootView.findViewById(R.id.trailer_head);
+            trailerTitle.setText("TRAILERS");
+
+            final TextView reviewTitle = (TextView) rootView.findViewById(R.id.review_head);
+            reviewTitle.setText("REVIEWS");
+
             //collapsingToolbar.setTitle(movie.getTitle());
             imageView = (ImageView) rootView.findViewById(R.id.backdrop);
-            Picasso.with(getActivity()).load(movie.getBackdropUrl()).into(imageView);
+            Picasso.with(getActivity())
+                    .load(movie.getBackdropUrl())
+                    .fit().centerCrop()
+                    .transform(PaletteTransformation.instance())
+                    .into(imageView, new PaletteTransformation.PaletteCallback(imageView) {
+                        @Override
+                        protected void onSuccess(Palette palette) {
+                            Palette.Swatch vibrant = palette.getVibrantSwatch();
+                            if (vibrant != null){
+                                int srcColor = vibrant.getRgb();
+                                collapsingToolbar.setContentScrimColor(srcColor);
+                                trailerTitle.setTextColor(srcColor);
+                                reviewTitle.setTextColor(srcColor);
+                                mButton_Credits.setTextColor(srcColor);
+
+                                int darkVibrant = palette.getDarkVibrantColor(vibrant.getRgb());
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    Window window = getActivity().getWindow();
+                                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                                    window.setStatusBarColor(darkVibrant);
+                                }
+                                /*float lightFactor = 1.5f;
+                                int lightVibrant = Color.argb(
+                                        Color.alpha(darkVibrant),
+                                        Color.red((int)(Color.red(darkVibrant)*lightFactor)),
+                                        Color.green((int)(Color.green(darkVibrant)*lightFactor)),
+                                        Color.blue((int)(Color.blue(darkVibrant)*lightFactor))
+                                );
+
+                                Log.v(TAG,"lightvibrant: "+lightVibrant);
+                                collapsingToolbar.setContentScrimColor(lightVibrant);
+                                trailerTitle.setTextColor(lightVibrant);
+                                reviewTitle.setTextColor(lightVibrant);
+                                mButton_Credits.setTextColor(lightVibrant);*/
+
+                                //int darkVibrant = palette.getDarkVibrantColor(vibrant.getRgb());
+                                /*float factor = 1.4f;
+                                int darkVibrant = Color.argb(
+                                        Color.alpha(srcColor),
+                                        Color.red((int)(Color.red(srcColor)*factor)),
+                                        Color.green((int)(Color.green(srcColor)*factor)),
+                                        Color.blue((int)(Color.blue(srcColor)*factor))
+                                );
+                                Log.v(TAG,"darkvibrant: "+darkVibrant);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    Window window = getActivity().getWindow();
+                                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                                    window.setStatusBarColor(darkVibrant);
+                                }*/
+                            }
+                        }
+
+                        @Override
+                        public void onError() {
+
+                        }
+                    });
+
+
+            //menuRed.hideMenuButton(false);
+            menuRed.setOnMenuButtonClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (menuRed.isOpened()) {
+                        //Toast.makeText(getActivity(), menuRed.getMenuButtonLabelText(), Toast.LENGTH_SHORT).show();
+                    }
+                    menuRed.toggle(true);
+                }
+            });
 
             if (isFavourtie(movie.getId()))
-                fab.setImageResource(R.drawable.ic_favorite_white_24dp);
+                fab1.setImageResource(R.drawable.ic_favorite_white_24dp);
             else
-                fab.setImageResource(R.drawable.ic_favorite_border_white_24dp);
+                fab1.setImageResource(R.drawable.ic_favorite_border_white_24dp);
 
-            fab.setOnClickListener(new View.OnClickListener() {
+            fab1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     isFavourtie(movie.getId());
@@ -185,45 +295,22 @@ public class DetailsFragment extends Fragment {
                 }
             });
 
-            mButton.setOnClickListener(new View.OnClickListener() {
+            fab3.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (isExpanded) {
-                        mButton.setImageResource(R.drawable.ic_arrow_drop_up_black_24dp);
-                        mLinearLayoutReview.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "Reviews Hidden!", Toast.LENGTH_SHORT).show();
-                        isExpanded = false;
-                    } else {
-                        isExpanded = true;
-                        mButton.setImageResource(R.drawable.ic_arrow_drop_down_black_24dp);
-                        mLinearLayoutReview.setVisibility(View.VISIBLE);
-                        Toast.makeText(getContext(),"Reviews Shown!",Toast.LENGTH_SHORT).show();
-                    }
+                    Log.v("DetailFragment","inside Fab2 clicklistener");
+                    createShareUrlIntent(trailerUrl);
                 }
             });
         }
         return rootView;
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Inflate menu resource file.
-        inflater.inflate(R.menu.menu_details, menu);
-        // Locate MenuItem with ShareActionProvider
-        MenuItem item = menu.findItem(R.id.menu_item_share);
-        // Fetch and store ShareActionProvider
-        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
-        if (mShareActionProvider != null) {
-            mShareActionProvider.setShareIntent(createShareUrlIntent(null));
-        } else {
-            Log.d(TAG, "Share Action Provider is null?");
-        }
-    }
-
     public void FetchMovieElements(int movieId) {
         mReviewData = new ArrayList<>();
         mReviewAdapter = new ReviewAdapter(getActivity(), R.layout.list_item_review, mReviewData);
         mTrailerAdapter = new TrailerAdapter(getActivity(), R.layout.list_item_trailer, new ArrayList<MovieTrailerModel>());
+        mCreditsAdapter = new CreditsAdapter(getActivity(), R.layout.list_item_credits, new ArrayList<MovieCreditsModel>());
         if(Utility.hasConnection(getActivity())) {
             // Fetch Review data
             FetchReviewTask reviewTask = new FetchReviewTask(getActivity(), mReviewAdapter);
@@ -232,6 +319,10 @@ public class DetailsFragment extends Fragment {
             // Fetch Trailer data
             FetchTrailerTask trailerTask = new FetchTrailerTask(getActivity(), mTrailerAdapter);
             trailerTask.execute(Integer.toString(movieId));
+
+            // Fetch Credits data
+            FetchCreditsTask creditsTask = new FetchCreditsTask(getActivity(), mCreditsAdapter);
+            creditsTask.execute(Integer.toString(movieId));
         }
     }
 
@@ -252,7 +343,7 @@ public class DetailsFragment extends Fragment {
                     buildFavouriteMoviesUriWithMovieId(movieId), null, null);
             Snackbar.make(view, "REMOVED FROM FAVOURITES!", Snackbar.LENGTH_SHORT)
                     .setAction("Action", null).show();
-            fab.setImageResource(R.drawable.ic_favorite_border_white_24dp);
+            fab1.setImageResource(R.drawable.ic_favorite_border_white_24dp);
         } else {
             /*Add values into DB*/
             ContentValues contentValues = new ContentValues();
@@ -271,12 +362,12 @@ public class DetailsFragment extends Fragment {
 
             Snackbar.make(view, "ADDED TO FAVOURITES!", Snackbar.LENGTH_SHORT)
                     .setAction("Action", null).show();
-            fab.setImageResource(R.drawable.ic_favorite_white_24dp);
+            fab1.setImageResource(R.drawable.ic_favorite_white_24dp);
         }
     }
 
 
-    private Intent createShareUrlIntent(String videoLink) {
+    private void createShareUrlIntent(String videoLink) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -286,7 +377,8 @@ public class DetailsFragment extends Fragment {
         }else
             shareYoutube = "No Trailers Available Right Now";
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareYoutube);
-        return shareIntent;
+        startActivity(Intent.createChooser(shareIntent, "Share link using"));
+        //return shareIntent;
     }
 
     private void setupWidgets(View rootView) {
@@ -312,14 +404,21 @@ public class DetailsFragment extends Fragment {
                 if(mTrailerAdapter.getCount()>0) {
                     mHasTrailers=true;
                     youtubeId = mTrailerAdapter.getItem(0).mKey;
-                    if (mShareActionProvider != null)
-                        mShareActionProvider.setShareIntent(createShareUrlIntent(youtubeId));
+                    //if (mShareActionProvider != null)
+                        //mShareActionProvider.setShareIntent(createShareUrlIntent(youtubeId));
+                    //trailerUrl = youtubeId;
                     for (int iter = 0; iter < mTrailerAdapter.getCount(); iter++) {
                         View item = mTrailerAdapter.getView(iter, null, null);
                         mLinearLayoutTrailer.addView(item);
                     }
                 }
+            } else if (event.getName().equals("FetchCreditsTask")){
+                for (int iter=0; iter < mCreditsAdapter.getCount(); iter++){
+                    mHasCredits = true;
+                }
+
             }
+            dialog.dismiss();
         }
     }
 }

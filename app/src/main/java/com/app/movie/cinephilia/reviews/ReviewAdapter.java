@@ -1,11 +1,13 @@
 package com.app.movie.cinephilia.reviews;
 
 import android.content.Context;
+import android.media.Image;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.app.movie.cinephilia.R;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
  */
 public class ReviewAdapter extends ArrayAdapter<MovieReviewModel> {
     private ArrayList<MovieReviewModel> mReviewData = new ArrayList<>();
+    private boolean isExpanded = false;
 
     public static class ViewHolder{
         public TextView author;
@@ -36,19 +39,20 @@ public class ReviewAdapter extends ArrayAdapter<MovieReviewModel> {
 
     @Override
     public View getView(int pos, View convertView, ViewGroup parent){
-        ViewHolder viewHolder;
+        final ViewHolder viewHolder;
         if(convertView == null){
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.list_item_review, parent, false);
             viewHolder.author = (TextView) convertView.findViewById(R.id.text_view_author);
             viewHolder.content = (TextView) convertView.findViewById(R.id.text_view_content);
+
+            ImageButton expandReview = (ImageButton) convertView.findViewById(R.id.expand_review);
             convertView.setTag(viewHolder);
         }else
             viewHolder = (ViewHolder)convertView.getTag();
 
         MovieReviewModel movieReviewModel = mReviewData.get(pos);
-        Log.v("ReviewAdapter",movieReviewModel.mAuthor);
         viewHolder.author.setText(movieReviewModel.mAuthor);
         viewHolder.content.setText(movieReviewModel.mContent);
 

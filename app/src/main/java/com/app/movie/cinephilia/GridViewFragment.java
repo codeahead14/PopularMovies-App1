@@ -1,17 +1,12 @@
 package com.app.movie.cinephilia;
 
-import android.app.ProgressDialog;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -22,28 +17,14 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.app.movie.cinephilia.MovieDBAPIs.MovieContract;
 import com.facebook.stetho.Stetho;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Array;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -58,6 +39,14 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     private static final String MOVIES_TAG = "MovieModel";
     private GridView mGridView;
     private Bundle bundle;
+    public static final String ARG_PAGE = "ARG_PAGE";
+    private int mPage;
+    private View rootView;
+    private AVLoadingIndicatorDialog dialog;
+
+    // Page Number for Endless Scrolling
+    private String pageNumber = "1";
+    private static int pgIntNum = 1;
 
     public static final String BUNDLE_TAG = "MoviesList";
 
@@ -69,9 +58,18 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     public GridViewFragment() {
     }
 
+    public static GridViewFragment newInstance(int page) {
+        Bundle args = new Bundle();
+        args.putInt(ARG_PAGE, page);
+        GridViewFragment fragment = new GridViewFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mPage = getArguments().getInt(ARG_PAGE);
         mGridData = null;
         mGridAdapter = new GridViewAdapter(getActivity(), R.layout.grid_item_layout, new ArrayList<MovieModel>());
         if (savedInstanceState != null) {
@@ -83,7 +81,7 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
             mGridAdapter.updateValues(mGridData);
         }
 
-        setHasOptionsMenu(true);
+        setHasOptionsMenu(false);
     }
 
     @Override
@@ -113,7 +111,7 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.gridviewfragment, menu);
+        //inflater.inflate(R.menu.appbar_menu, menu);
 
         // Adding Debugging using Stetho
         Stetho.initialize(
@@ -126,9 +124,12 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = (View) inflater.inflate(R.layout.fragment_main, container, false);
+        rootView = (View) inflater.inflate(R.layout.fragment_main, container, false);
+        dialog = new AVLoadingIndicatorDialog(getActivity(), rootView);
+        dialog.setMessage("Fetching Awesomeness");
+
         mGridView = (GridView) rootView.findViewById(R.id.gridview);
-        mGridView.setEmptyView(rootView.findViewById(R.id.emptyView));
+        //mGridView.setEmptyView(rootView.findViewById(R.id.emptyView));
 
         mGridView.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -137,13 +138,15 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
                         final int width = mGridView.getWidth();
                         int numCol = (int) Math.round((double)width/(double)getResources()
                                                             .getDimensionPixelSize(R.dimen.poster_width));
-                        Log.v(TAG,"Num width: "+getResources()
-                                .getDimensionPixelSize(R.dimen.poster_width)+" "+width);
                         mGridView.setNumColumns(numCol);
                     }
                 }
         );
 
+        if(Utility.hasConnection(getActivity())){
+            dialog.show();
+            //startAnim();
+        }
         return rootView;
     }
 
@@ -151,7 +154,6 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mGridView.setAdapter(mGridAdapter);
-        Log.v(TAG, "view count: " + mGridAdapter.getCount());
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -170,21 +172,47 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String order = sharedPreferences.getString("Sort",getString(R.string.pref_sort_order));
 
-        if(order.equals("Show Favorites")){
+        if(mPage == 3){
+            Log.v(TAG,"Page: "+Integer.toString(mPage));
+            getLoaderManager().restartLoader(LOADER_FAVOURITE_MOVIES_ID, null, this);
+        }else{
+            if(mPage == 1)
+                order = "Most Popular";
+            else if(mPage == 2)
+                order = "Highest Rated";
+
+            pageNumber = Integer.toString(pgIntNum);
+            String[] args = {order, pageNumber};
+            FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity(),this);
+            fetchMovieTask.execute(args);
+        }
+
+        /*if(order.equals("Show Favorites")){
             Log.v(TAG,"order: "+order);
             getLoaderManager().restartLoader(LOADER_FAVOURITE_MOVIES_ID, null, this);
         }else {
             Log.v(TAG, "fetch order: " + order);
             FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity(),this);
             fetchMovieTask.execute(order);
-        }
+        }*/
     }
 
     @Override
     public void MovieDataFetchFinished(ArrayList<MovieModel> movies){
-        mGridAdapter.clear();
+        //mGridAdapter.clear();
         mGridAdapter.updateValues(movies);
         ((Callback)getActivity()).defaultItemSelected(movies.get(0));
+        //rootView.findViewById(R.id.avloadingIndicatorView).setVisibility(View.GONE);
+        mGridView.setOnScrollListener(new EndlessScrollListener() {
+            @Override
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                pgIntNum++;
+                updateGrid();
+                return true;
+            }
+        });
+        dialog.cancel();
+        //stopAnim();
     }
 
 
@@ -215,9 +243,13 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
         }
         cursor.close();
         mGridAdapter.updateValues(movies);
+        //rootView.findViewById(R.id.avloadingIndicatorView).setVisibility(View.GONE);
+        dialog.cancel();
+        //stopAnim();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
     }
+
 }
