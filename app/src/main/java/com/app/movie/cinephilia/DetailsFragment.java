@@ -1,7 +1,9 @@
 package com.app.movie.cinephilia;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.content.ContentResolver;
@@ -216,9 +218,11 @@ public class DetailsFragment extends Fragment {
                     .load(movie.getBackdropUrl())
                     .fit().centerCrop()
                     .transform(PaletteTransformation.instance())
-                    .into(imageView, new PaletteTransformation.PaletteCallback(imageView) {
+                    .into(imageView);/*, new PaletteTransformation.PaletteCallback(imageView) {
                         @Override
-                        protected void onSuccess(Palette palette) {
+                        public final void onSuccess() {
+                            Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+                            Palette palette = PaletteTransformation.getPalette(bitmap);
                             Palette.Swatch vibrant = palette.getVibrantSwatch();
                             if (vibrant != null){
                                 int srcColor = vibrant.getRgb();
@@ -260,7 +264,7 @@ public class DetailsFragment extends Fragment {
                                     Window window = getActivity().getWindow();
                                     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                                     window.setStatusBarColor(darkVibrant);
-                                }*/
+                                }
                             }
                         }
 
@@ -268,7 +272,7 @@ public class DetailsFragment extends Fragment {
                         public void onError() {
 
                         }
-                    });
+                    });*/
 
 
             //menuRed.hideMenuButton(false);

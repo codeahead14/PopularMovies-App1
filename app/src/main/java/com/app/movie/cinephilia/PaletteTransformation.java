@@ -65,9 +65,9 @@ public final class PaletteTransformation implements Transformation {
             mImageView = new WeakReference<ImageView>(imageView);
         }
 
-        protected abstract void onSuccess(Palette palette);
+        //protected abstract void onSuccess(Palette palette);
 
-        @Override
+        /*@Override
         public final void onSuccess() {
             if (getImageView() == null) {
                 return;
@@ -75,7 +75,7 @@ public final class PaletteTransformation implements Transformation {
             final Bitmap bitmap = ((BitmapDrawable) getImageView().getDrawable()).getBitmap(); // Ew!
             final Palette palette = getPalette(bitmap);
             onSuccess(palette);
-        }
+        }*/
 
         private ImageView getImageView() {
             return mImageView.get();

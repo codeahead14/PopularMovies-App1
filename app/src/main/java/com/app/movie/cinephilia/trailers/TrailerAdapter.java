@@ -70,7 +70,7 @@ public class TrailerAdapter extends ArrayAdapter<MovieTrailerModel> {
         Picasso
                 .with(mContext)
                 .load(url)
-                .resize(720,400)
+                .resize(300,200)
                 .centerInside()
                 .into(viewHolder.trailerImg);
 
