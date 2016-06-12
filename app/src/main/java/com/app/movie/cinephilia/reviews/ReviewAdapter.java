@@ -1,8 +1,6 @@
 package com.app.movie.cinephilia.reviews;
 
 import android.content.Context;
-import android.media.Image;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +9,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.app.movie.cinephilia.R;
-import com.app.movie.cinephilia.trailers.MovieTrailerModel;
 
 import java.util.ArrayList;
 
@@ -21,10 +18,12 @@ import java.util.ArrayList;
 public class ReviewAdapter extends ArrayAdapter<MovieReviewModel> {
     private ArrayList<MovieReviewModel> mReviewData = new ArrayList<>();
     private boolean isExpanded = false;
+    ImageButton expandReview;
 
     public static class ViewHolder{
         public TextView author;
-        public TextView content;
+        public TextView content_collapsed;
+        public TextView content_expanded;
     }
 
     public ReviewAdapter(Context context, int layoutResourceId, ArrayList<MovieReviewModel> reviews){
@@ -45,16 +44,41 @@ public class ReviewAdapter extends ArrayAdapter<MovieReviewModel> {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.list_item_review, parent, false);
             viewHolder.author = (TextView) convertView.findViewById(R.id.text_view_author);
-            viewHolder.content = (TextView) convertView.findViewById(R.id.text_view_content);
+            viewHolder.content_collapsed = (TextView) convertView.findViewById(R.id.text_view_content_collapsed);
+            viewHolder.content_expanded = (TextView) convertView.findViewById(R.id.text_view_content_expanded);
 
-            ImageButton expandReview = (ImageButton) convertView.findViewById(R.id.expand_review);
+            expandReview = (ImageButton) convertView.findViewById(R.id.expand_review);
             convertView.setTag(viewHolder);
         }else
             viewHolder = (ViewHolder)convertView.getTag();
 
         MovieReviewModel movieReviewModel = mReviewData.get(pos);
         viewHolder.author.setText(movieReviewModel.mAuthor);
-        viewHolder.content.setText(movieReviewModel.mContent);
+        viewHolder.content_collapsed.setText(movieReviewModel.mContent);
+        viewHolder.content_expanded.setText(movieReviewModel.mContent);
+        expandReview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if( !isExpanded){
+                    isExpanded = true;
+                    viewHolder.author.setTextColor(
+                            getContext()
+                                    .getResources()
+                                    .getColor(R.color.colorPrimary));
+                    viewHolder.content_collapsed.setVisibility(View.GONE);
+                    viewHolder.content_expanded.setVisibility(View.VISIBLE);
+                } else if( isExpanded){
+                    isExpanded = false;
+                    viewHolder.author.setTextColor(
+                            getContext()
+                                    .getResources()
+                                    .getColor(R.color.black));
+                    viewHolder.content_expanded.setVisibility(View.GONE);
+                    viewHolder.content_collapsed.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
 
         return convertView;
     }

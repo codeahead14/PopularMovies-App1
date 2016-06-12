@@ -78,11 +78,12 @@
 
                         <TextView
                             android:id="@+id/text_view_user_rating"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingBottom="@dimen/margin_inline"
+                            android:padding="@dimen/margin_inline"
                             android:textColor="@color/black"
-                            android:textSize="@dimen/info_textSize" />
+                            android:textSize="@dimen/content_textSize"
+                            android:background="@drawable/rating_background"/>
 
                         <TextView
                             android:id="@+id/text_view_release_date"

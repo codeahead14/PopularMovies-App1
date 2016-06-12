@@ -208,11 +208,11 @@ public class DetailsFragment extends Fragment {
 
             // Set release date
             TextView releaseDateTextView = (TextView) rootView.findViewById(R.id.text_view_release_date);
-            releaseDateTextView.setText(getString(R.string.releaseDate) + ":" + movie.getReleaseDate());
+            releaseDateTextView.setText(movie.getReleaseDate());
 
             // Set user rating
             TextView userRatingTextView = (TextView) rootView.findViewById(R.id.text_view_user_rating);
-            userRatingTextView.setText(movie.getUserRating() + "/10");
+            userRatingTextView.setText(String.valueOf(movie.getUserRating()));
 
             // Set synopsis
             TextView viewSynopsisTextView = (TextView) rootView.findViewById(R.id.text_view_synopsis);

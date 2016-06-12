@@ -49,13 +49,23 @@
         </RelativeLayout>
 
         <TextView
-            android:id="@+id/text_view_content"
+            android:id="@+id/text_view_content_collapsed"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="@dimen/margin_inline"
             android:paddingBottom="@dimen/margin_inline"
             android:maxLines="4"
-            android:ellipsize="end"/>
+            android:ellipsize="end"
+            android:visibility="visible"/>
+
+        <TextView
+            android:id="@+id/text_view_content_expanded"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/margin_inline"
+            android:paddingBottom="@dimen/margin_inline"
+            android:textColor="@color/black"
+            android:visibility="gone"/>
 
     </LinearLayout>
 </android.support.v7.widget.CardView>
