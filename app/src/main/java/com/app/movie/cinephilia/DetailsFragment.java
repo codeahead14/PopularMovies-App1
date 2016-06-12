@@ -1,42 +1,33 @@
 package com.app.movie.cinephilia;
 
-import android.app.Activity;
-import android.graphics.Color;
 import android.os.Build;
-import android.os.Handler;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 //import android.support.design.widget.FloatingActionButton;
 import com.app.movie.cinephilia.CastandCrew.CreditsAdapter;
 import com.app.movie.cinephilia.CastandCrew.FetchCreditsTask;
 import com.app.movie.cinephilia.CastandCrew.MovieCreditsModel;
+import com.app.movie.cinephilia.trailers.TrailerRecyclerAdapter;
 import com.github.clans.fab.FloatingActionButton;
 //import com.github.fab.sample.R;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 //import android.support.v7.widget.ShareActionProvider;
-import android.support.v7.graphics.Palette;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.view.animation.AnimationUtils;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -51,12 +42,9 @@ import com.app.movie.cinephilia.reviews.MovieReviewModel;
 import com.app.movie.cinephilia.reviews.ReviewAdapter;
 import com.app.movie.cinephilia.trailers.FetchTrailerTask;
 import com.app.movie.cinephilia.trailers.MovieTrailerModel;
-import com.app.movie.cinephilia.trailers.TrailerAdapter;
 import com.github.clans.fab.FloatingActionMenu;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -72,7 +60,6 @@ public class DetailsFragment extends Fragment {
     private ArrayList<MovieReviewModel> mReviewData;
     private ArrayList<MovieCreditsModel> mCreditsData;
     private ReviewAdapter mReviewAdapter;
-    private TrailerAdapter mTrailerAdapter;
     private CreditsAdapter mCreditsAdapter;
     private LinearLayout mLinearLayoutReview, mLinearLayoutTrailer;
     private static Toolbar toolbar;
@@ -82,6 +69,9 @@ public class DetailsFragment extends Fragment {
     private String youtubeId, shareYoutube;
     private static Button mButton_Credits;
     private AVLoadingIndicatorDialog dialog;
+    private CardView emptyCardReviews, emptyCardTrailers;
+    private RecyclerView trailerRecyclerView;
+    private TrailerRecyclerAdapter mTrailerAdapter;
 
     /* Floating Action Buttons - Using Clans Library */
     private FloatingActionMenu menuRed;
@@ -92,6 +82,7 @@ public class DetailsFragment extends Fragment {
     // Public members
     public static final String ARG_MOVIE = "movieFragment";
     public static int mMovieId;
+    public static int layout_width, layout_height;
 
     public DetailsFragment() {
     }
@@ -139,9 +130,11 @@ public class DetailsFragment extends Fragment {
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_detail_layout, container, false);
         setupWidgets(rootView);
-        dialog = new AVLoadingIndicatorDialog(getActivity(), rootView);
-        dialog.setMessage("Fetching Details.. Just for You!!");
-        dialog.show();
+
+        //getActivity().getWindow().setEnterTransition(slide);
+        //dialog = new AVLoadingIndicatorDialog(getActivity(), rootView);
+        //dialog.setMessage("Fetching Details.. Just for You!!");
+        //dialog.show();
 
         menuRed = (FloatingActionMenu) rootView.findViewById(R.id.menu_red);
         fab1 = (FloatingActionButton) rootView.findViewById(R.id.fab1);
@@ -152,7 +145,32 @@ public class DetailsFragment extends Fragment {
 
         if (mHasData) {
             mLinearLayoutReview = (LinearLayout) rootView.findViewById(R.id.review_list);
-            mLinearLayoutTrailer = (LinearLayout) rootView.findViewById(R.id.trailer_list);
+            final ViewTreeObserver vto = mLinearLayoutReview.getViewTreeObserver();
+            vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    layout_width  = mLinearLayoutReview.getMeasuredWidth();
+                    layout_height = mLinearLayoutReview.getMeasuredHeight();
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        mLinearLayoutReview.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    }
+                    else {
+                        mLinearLayoutReview.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    }
+                }
+            });
+
+            //mLinearLayoutTrailer = (LinearLayout) rootView.findViewById(R.id.trailer_list);
+            emptyCardReviews = (CardView) rootView.findViewById(R.id.empty_card_reviews);
+            emptyCardTrailers = (CardView) rootView.findViewById(R.id.empty_card_trailers);
+
+            trailerRecyclerView = (RecyclerView) rootView.findViewById(R.id.trailer_recycler);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+            layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+            layoutManager.scrollToPosition(0);
+            trailerRecyclerView.setLayoutManager(layoutManager);
+            trailerRecyclerView.setAdapter(mTrailerAdapter);
 
             if(!Utility.hasConnection(getContext())){
                 Toast.makeText(getActivity(),"Unable to Fetch Trailers and Reviews!! No Connectivity!!",
@@ -216,60 +234,7 @@ public class DetailsFragment extends Fragment {
                     .load(movie.getBackdropUrl())
                     .fit().centerCrop()
                     .transform(PaletteTransformation.instance())
-                    .into(imageView, new PaletteTransformation.PaletteCallback(imageView) {
-                        @Override
-                        protected void onSuccess(Palette palette) {
-                            Palette.Swatch vibrant = palette.getVibrantSwatch();
-                            if (vibrant != null){
-                                int srcColor = vibrant.getRgb();
-                                collapsingToolbar.setContentScrimColor(srcColor);
-                                trailerTitle.setTextColor(srcColor);
-                                reviewTitle.setTextColor(srcColor);
-                                mButton_Credits.setTextColor(srcColor);
-
-                                int darkVibrant = palette.getDarkVibrantColor(vibrant.getRgb());
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    Window window = getActivity().getWindow();
-                                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                                    window.setStatusBarColor(darkVibrant);
-                                }
-                                /*float lightFactor = 1.5f;
-                                int lightVibrant = Color.argb(
-                                        Color.alpha(darkVibrant),
-                                        Color.red((int)(Color.red(darkVibrant)*lightFactor)),
-                                        Color.green((int)(Color.green(darkVibrant)*lightFactor)),
-                                        Color.blue((int)(Color.blue(darkVibrant)*lightFactor))
-                                );
-
-                                Log.v(TAG,"lightvibrant: "+lightVibrant);
-                                collapsingToolbar.setContentScrimColor(lightVibrant);
-                                trailerTitle.setTextColor(lightVibrant);
-                                reviewTitle.setTextColor(lightVibrant);
-                                mButton_Credits.setTextColor(lightVibrant);*/
-
-                                //int darkVibrant = palette.getDarkVibrantColor(vibrant.getRgb());
-                                /*float factor = 1.4f;
-                                int darkVibrant = Color.argb(
-                                        Color.alpha(srcColor),
-                                        Color.red((int)(Color.red(srcColor)*factor)),
-                                        Color.green((int)(Color.green(srcColor)*factor)),
-                                        Color.blue((int)(Color.blue(srcColor)*factor))
-                                );
-                                Log.v(TAG,"darkvibrant: "+darkVibrant);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    Window window = getActivity().getWindow();
-                                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                                    window.setStatusBarColor(darkVibrant);
-                                }*/
-                            }
-                        }
-
-                        @Override
-                        public void onError() {
-
-                        }
-                    });
-
+                    .into(imageView);
 
             //menuRed.hideMenuButton(false);
             menuRed.setOnMenuButtonClickListener(new View.OnClickListener() {
@@ -309,7 +274,8 @@ public class DetailsFragment extends Fragment {
     public void FetchMovieElements(int movieId) {
         mReviewData = new ArrayList<>();
         mReviewAdapter = new ReviewAdapter(getActivity(), R.layout.list_item_review, mReviewData);
-        mTrailerAdapter = new TrailerAdapter(getActivity(), R.layout.list_item_trailer, new ArrayList<MovieTrailerModel>());
+        mTrailerAdapter = new TrailerRecyclerAdapter(getActivity(), R.layout.list_item_trailer,
+                new ArrayList<MovieTrailerModel>());
         mCreditsAdapter = new CreditsAdapter(getActivity(), R.layout.list_item_credits, new ArrayList<MovieCreditsModel>());
         if(Utility.hasConnection(getActivity())) {
             // Fetch Review data
@@ -396,12 +362,16 @@ public class DetailsFragment extends Fragment {
     public void onMovieLoaded(AsyncTaskResultEvent event) {
         if (event.getResult()) {
             if (event.getName().equals("FetchReviewTask")) {
-                for (int iter = 0; iter < mReviewAdapter.getCount(); iter++) {
-                    View item = mReviewAdapter.getView(iter, null, null);
-                    mLinearLayoutReview.addView(item);
+                if (mReviewAdapter.getCount() > 0){
+                    emptyCardReviews.setVisibility(View.GONE);
+                    for (int iter = 0; iter < mReviewAdapter.getCount(); iter++) {
+                        View item = mReviewAdapter.getView(iter, null, null);
+                        mLinearLayoutReview.addView(item);
+                    }
                 }
             } else if (event.getName().equals("FetchTrailerTask")) {
-                if(mTrailerAdapter.getCount()>0) {
+                /*if(mTrailerAdapter.getCount()>0) {
+                    emptyCardTrailers.setVisibility(View.GONE);
                     mHasTrailers=true;
                     youtubeId = mTrailerAdapter.getItem(0).mKey;
                     //if (mShareActionProvider != null)
@@ -411,6 +381,12 @@ public class DetailsFragment extends Fragment {
                         View item = mTrailerAdapter.getView(iter, null, null);
                         mLinearLayoutTrailer.addView(item);
                     }
+                }*/
+                if(mTrailerAdapter.getItemCount() > 0){
+                    emptyCardTrailers.setVisibility(View.GONE);
+                    mHasTrailers=true;
+                    youtubeId = mTrailerAdapter.getItem(0).mKey;
+
                 }
             } else if (event.getName().equals("FetchCreditsTask")){
                 for (int iter=0; iter < mCreditsAdapter.getCount(); iter++){
@@ -418,7 +394,7 @@ public class DetailsFragment extends Fragment {
                 }
 
             }
-            dialog.dismiss();
+            //dialog.dismiss();
         }
     }
 }

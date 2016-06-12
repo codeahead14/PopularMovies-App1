@@ -31,5 +31,7 @@
 
     <string name="movie_credits">View Cast and Crew Details</string>
     <string name="credits_title">Movie Cast</string>
+    <string name="no_trailers">No Trailers with Us Right Now!!</string>
+    <string name="no_reviews">No Reviews with Us Right Now!!</string>
 
 </resources>

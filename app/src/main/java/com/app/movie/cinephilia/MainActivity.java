@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
@@ -146,7 +147,11 @@ public class MainActivity extends AppCompatActivity implements GridViewFragment.
         } else {
             Intent intent = new Intent(this, DetailsActivity.class);
             intent.putExtra(Intent.EXTRA_TEXT, item);
-            startActivity(intent);
+
+            Bundle bundle = ActivityOptionsCompat
+                    .makeSceneTransitionAnimation(this)
+                    .toBundle();
+            startActivity(intent,bundle);
         }
     }
 

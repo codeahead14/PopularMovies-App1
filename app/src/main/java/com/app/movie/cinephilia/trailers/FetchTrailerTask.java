@@ -28,14 +28,15 @@ import java.util.ArrayList;
 public class FetchTrailerTask extends AsyncTask<String, Void, ArrayList<MovieTrailerModel>> {
 
     Activity mContext;
-    TrailerAdapter mTrailersAdapter;
+    //TrailerAdapter mTrailersAdapter;
+    TrailerRecyclerAdapter mTrailersAdapter;
     //OnReviewDataFetchFinished onReviewDataFetchFinished;
     private ProgressDialog progress;
 
     private final String LOG_TAG = FetchTrailerTask.class.getSimpleName();
 
 
-    public FetchTrailerTask(Activity context, TrailerAdapter adapter){ //, OnReviewDataFetchFinished onReviewDataFetchFinished){
+    public FetchTrailerTask(Activity context, TrailerRecyclerAdapter adapter){
         this.mContext = context;
         this.mTrailersAdapter = adapter;
         //this.onReviewDataFetchFinished = onReviewDataFetchFinished;
@@ -186,10 +187,12 @@ public class FetchTrailerTask extends AsyncTask<String, Void, ArrayList<MovieTra
 
         Log.v(LOG_TAG, "TASK POST EXECUTE");
         if(result != null){
-            mTrailersAdapter.clear();
-            for(MovieTrailerModel elem: result) {
-                mTrailersAdapter.add(elem);
-            }
+            //mTrailersAdapter.clear();
+            //for(MovieTrailerModel elem: result) {
+            //    mTrailersAdapter.add(elem);
+            //}
+            for(MovieTrailerModel elem: result)
+                mTrailersAdapter.addItem(elem);
         }
         BusProvider.getInstance().post(new AsyncTaskResultEvent(true, "FetchTrailerTask"));
         mTrailersAdapter.notifyDataSetChanged();

@@ -33,7 +33,7 @@ public class CreditsActivity extends AppCompatActivity {
         closeActivityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //CreditsActivity.this.overridePendingTransition(R.anim.slide_down_info, R.anim.no_change);
+                CreditsActivity.this.overridePendingTransition(R.anim.slide_down_info, R.anim.no_change);
                 finish();
             }
         });
@@ -48,8 +48,6 @@ public class CreditsActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         super.onBackPressed();
-        overridePendingTransition(R.anim.slide_down_info, R.anim.no_change);
+        //overridePendingTransition(R.anim.slide_down_info, R.anim.no_change);
     }
-
-
 }

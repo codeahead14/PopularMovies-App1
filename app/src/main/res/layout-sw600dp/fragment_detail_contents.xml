@@ -112,7 +112,7 @@
             android:textColor="@color/colorPrimaryDark"
             android:gravity="bottom"/>
 
-        <LinearLayout
+        <!--<LinearLayout
             style="@style/InLayoutPadding"
             android:id="@+id/trailer_list"
             android:layout_width="match_parent"
@@ -120,7 +120,12 @@
             android:orientation="vertical"
             android:paddingTop="0dp"
             android:paddingBottom="0dp"
-            android:visibility="visible"/>
+            android:visibility="visible"/>-->
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/trailer_recycler"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <RelativeLayout
             android:layout_width="match_parent"
