@@ -31,6 +31,7 @@
         <item name="android:typeface">sans</item>
         <item name="android:textSize">@dimen/title_size</item>
         <item name="android:textColor">@color/black</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Large</item>
     </style>
 
     <!-- Define android:paddingEnd and Start in the layout, since it requires Min API level 17 -->
@@ -44,7 +45,7 @@
     <style name="MyCustomTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabTextAppearance">@style/MyCustomTabText</item>
         <item name="tabSelectedTextColor">@color/white</item>
-        <item name="tabIndicatorColor">@color/indicator</item>
+        <item name="tabIndicatorColor">@color/colorPrimary</item>
     </style>
 
     <style name="MyCustomTabText" parent="TextAppearance.AppCompat.Button">
@@ -52,6 +53,17 @@
         <item name="android:color">@color/lightGrey</item>
         <item name="textAllCaps">false</item>
         <!--<item name="android:paddingLeft">4dp</item>-->
+    </style>
+
+    <style name="Theme.App.Base" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorControlNormal">@color/grey500</item>
+        <item name="colorControlActivated">@color/grey500</item>
+        <item name="colorControlHighlight">@color/grey500</item>
+    </style>
+    
+    <style name="Dialog.Theme" parent="android:Theme.Dialog">
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
     </style>
 
 </resources>

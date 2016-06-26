@@ -1,5 +1,6 @@
 package com.app.movie.cinephilia;
 
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -41,7 +42,8 @@ public class MainActivity extends AppCompatActivity implements GridViewFragment.
     private static View parentLayout;
     public static boolean mTwoPane = false;
     private Context context;
-    private BottomBar mBottomBar;
+    BroadcastReceiver broadcastReceiver;
+    private boolean connectionLostFlag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,13 +89,15 @@ public class MainActivity extends AppCompatActivity implements GridViewFragment.
         //getMenuInflater().inflate(R.menu.menu_main, menu);
 
         getMenuInflater().inflate(R.menu.menu_search_movie, menu);
+        /*SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         final MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));*/
+
+        /*searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(context,"Searching",Toast.LENGTH_SHORT).show();
-                // Reset SearchView
                 searchView.clearFocus();
                 searchView.setQuery("", false);
                 searchView.setIconified(true);
@@ -105,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements GridViewFragment.
             public boolean onQueryTextChange(String s) {
                 return false;
             }
-        });
+        });*/
         return true;
     }
 
@@ -116,8 +120,8 @@ public class MainActivity extends AppCompatActivity implements GridViewFragment.
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, User_Settings.class);
+        if (id == R.id.action_search) {
+            Intent intent = new Intent(this, MovieSearchActivity.class);
             startActivity(intent);
             return true;
         }
@@ -165,32 +169,26 @@ public class MainActivity extends AppCompatActivity implements GridViewFragment.
     /** Called when the activity has become visible. */
     @Override
     protected void onResume() {
-        this.utility = new Utility(parentLayout);
-        registerReceiver(utility,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         super.onResume();
-        Log.d(msg, "The onResume() event");
     }
 
     /** Called when another activity is taking focus. */
     @Override
     protected void onPause() {
-        unregisterReceiver(utility);
+        //unregisterReceiver(broadcastReceiver);
         super.onPause();
-        Log.d(msg, "The onPause() event");
     }
 
     /** Called when the activity is no longer visible. */
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(msg, "The onStop() event");
     }
 
     /** Called just before the activity is destroyed. */
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(msg, "The onDestroy() event");
     }
 
 }

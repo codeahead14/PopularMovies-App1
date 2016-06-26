@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.okhttp.internal.Util;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -72,13 +73,15 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
             holder = new ViewHolder();
             holder.imageView = (ImageView) row.findViewById(R.id.grid_item_image);
             holder.textView = (TextView) row.findViewById(R.id.grid_item_text);
+            holder.releaseDateText = (TextView) row.findViewById(R.id.release_date_grid);
             row.setTag(holder);
         } else
             holder = (ViewHolder)row.getTag();
 
         MovieModel item = getItem(pos);
         final String url = item.getPosterUrl();
-        holder.textView.setText(item.getTitle());
+        holder.textView.setText(Double.toString(item.getUserRating()));
+        holder.releaseDateText.setText(Utility.formatDate(item.getReleaseDate()));
         Picasso.with(mContext)
                 .load(url)
                 .fit()
@@ -116,17 +119,13 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
     static class ViewHolder {
         ImageView imageView;
         TextView textView;
+        TextView releaseDateText;
     }
 
     public void updateValues(ArrayList<MovieModel> elements) {
-        //this.mGridData = elements;
-        int dataSize = mGridData.size();
-        Log.v(TAG,"number of elements: "+dataSize);
         for(MovieModel elem: elements){
-            Log.v(TAG,"Movie added: "+elem.getTitle());
             mGridData.add(elem);
         }
-        //this.mGridData.addAll(dataSize, elements);
         notifyDataSetChanged();
     }
 }

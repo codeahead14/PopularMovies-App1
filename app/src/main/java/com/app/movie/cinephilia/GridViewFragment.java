@@ -1,15 +1,23 @@
 package com.app.movie.cinephilia;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,7 +27,9 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
+import android.widget.RelativeLayout;
 
 import com.app.movie.cinephilia.MovieDBAPIs.MovieContract;
 import com.facebook.stetho.Stetho;
@@ -30,7 +40,7 @@ import java.util.ArrayList;
  * A placeholder fragment containing a simple view.
  */
 public class GridViewFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
-                                        OnMovieDataFetchFinished {
+                                        OnMovieDataFetchFinished, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = GridViewFragment.class.getSimpleName();
     private GridViewAdapter mGridAdapter;
@@ -43,12 +53,22 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
     private int mPage;
     private View rootView;
     private AVLoadingIndicatorDialog dialog;
+    private Parcelable state;
+    private BroadcastReceiver broadcastReceiver;
+    private boolean connectionLostFlag = false;
+    private RelativeLayout networkLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     // Page Number for Endless Scrolling
     private String pageNumber = "1";
     private static int pgIntNum = 1;
 
     public static final String BUNDLE_TAG = "MoviesList";
+
+    @Override
+    public void onRefresh() {
+        updateGrid();
+    }
 
     public interface Callback {
         void onItemSelected(MovieModel item);
@@ -96,13 +116,6 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
         updateGrid();
     }
 
-    Parcelable state;
-    @Override
-    public void onPause(){
-        state = mGridView.onSaveInstanceState();
-        super.onPause();
-    }
-
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -128,6 +141,16 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
         dialog = new AVLoadingIndicatorDialog(getActivity(), rootView);
         dialog.setMessage("Fetching Awesomeness");
 
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
+        networkLayout = (RelativeLayout) rootView.findViewById(R.id.networkLayout);
+        Button networkSettings = (Button) rootView.findViewById(R.id.networkButton);
+        networkSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(WifiManager.ACTION_PICK_WIFI_NETWORK));
+            }
+        });
+
         mGridView = (GridView) rootView.findViewById(R.id.gridview);
         //mGridView.setEmptyView(rootView.findViewById(R.id.emptyView));
 
@@ -145,7 +168,6 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
 
         if(Utility.hasConnection(getActivity())){
             dialog.show();
-            //startAnim();
         }
         return rootView;
     }
@@ -161,6 +183,13 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
                 ((Callback) getActivity()).onItemSelected(item);
             }
         });
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                updateGrid();
+            }
+        });
         // Restore previous state (including selected item index and scroll position)
         if(state != null) {
             Log.d(TAG, "trying to restore gridview state..");
@@ -168,33 +197,66 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
         }
     }
 
+    @Override
+    public void onResume() {
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent){
+                if(!Utility.hasConnection(context)){
+                    connectionLostFlag = true;
+                    if(mGridView.getCount() == 0 && mPage != 3) {
+                        Log.v(TAG,"grid count: "+mGridView.getCount());
+                        networkLayout.setVisibility(View.VISIBLE);
+                    }
+                } else if(Utility.hasConnection(context)) {
+                    if( connectionLostFlag) {
+                        connectionLostFlag = false;
+                        networkLayout.setVisibility(View.GONE);
+                    }
+                }
+            }
+        };
+
+        getActivity().registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        super.onResume();
+    }
+
+    /** Called when another activity is taking focus. */
+    @Override
+    public void onPause() {
+        getActivity().unregisterReceiver(broadcastReceiver);
+        state = mGridView.onSaveInstanceState();
+        super.onPause();
+    }
+
     public void updateGrid(){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String order = sharedPreferences.getString("Sort",getString(R.string.pref_sort_order));
+        //if(Utility.hasConnection(getActivity())) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String order = sharedPreferences.getString("Sort", getString(R.string.pref_sort_order));
 
-        if(mPage == 3){
-            Log.v(TAG,"Page: "+Integer.toString(mPage));
-            getLoaderManager().restartLoader(LOADER_FAVOURITE_MOVIES_ID, null, this);
-        }else{
-            if(mPage == 1)
-                order = "Most Popular";
-            else if(mPage == 2)
-                order = "Highest Rated";
+            if (mPage == 3) {
+                if(swipeRefreshLayout != null)
+                    swipeRefreshLayout.setRefreshing(false);
+                getLoaderManager().restartLoader(LOADER_FAVOURITE_MOVIES_ID, null, this);
+            } else {
+                if( Utility.hasConnection(getContext())) {
+                    if (mPage == 1)
+                        order = "Most Popular";
+                    else if (mPage == 2)
+                        order = "Highest Rated";
 
-            pageNumber = Integer.toString(pgIntNum);
-            String[] args = {order, pageNumber};
-            FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity(),this);
-            fetchMovieTask.execute(args);
-        }
+                    pageNumber = Integer.toString(pgIntNum);
+                    String[] args = {order, pageNumber};
+                    FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity(),this,
+                                            "fetchMovies");
+                    fetchMovieTask.execute(args);
+                } else if (!Utility.hasConnection(getContext())){
+                    if(swipeRefreshLayout != null)
+                        swipeRefreshLayout.setRefreshing(false);
+                }
+            }
 
-        /*if(order.equals("Show Favorites")){
-            Log.v(TAG,"order: "+order);
-            getLoaderManager().restartLoader(LOADER_FAVOURITE_MOVIES_ID, null, this);
-        }else {
-            Log.v(TAG, "fetch order: " + order);
-            FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity(),this);
-            fetchMovieTask.execute(order);
-        }*/
+        //}
     }
 
     @Override
@@ -212,6 +274,7 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
             }
         });
         dialog.cancel();
+        swipeRefreshLayout.setRefreshing(false);
         //stopAnim();
     }
 
@@ -229,7 +292,7 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
         Log.v(TAG,"fragment count: "+Integer.toString(cursor.getCount()));
         while (cursor.moveToNext()) {
             Log.v(TAG,"title: "+cursor.getString(
-                    cursor.getColumnIndex(MovieContract.FavoriteMoviesEntry.COLUMN_ORIGINAL_TITLE)));
+                    cursor.getColumnIndex(MovieContract.FavoriteMoviesEntry.COLUMN_RELEASE_DATE)));
             MovieModel movie = new MovieModel(cursor.getString(
                             cursor.getColumnIndex(MovieContract.FavoriteMoviesEntry.COLUMN_ORIGINAL_TITLE)),
                     cursor.getDouble(cursor.getColumnIndex(MovieContract.FavoriteMoviesEntry.COLUMN_VOTE_AVG)),

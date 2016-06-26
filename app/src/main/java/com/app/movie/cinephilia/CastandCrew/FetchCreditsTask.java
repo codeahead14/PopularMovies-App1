@@ -85,6 +85,7 @@ public class FetchCreditsTask extends AsyncTask<String, Void, ArrayList<MovieCre
                     .build();
 
             URL url = new URL(builtUri.toString());
+            Log.v(LOG_TAG,url.toString());
 
             // Create the request and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -111,9 +112,9 @@ public class FetchCreditsTask extends AsyncTask<String, Void, ArrayList<MovieCre
             }
             creditsJsonStr = buffer.toString();
 
-            Log.v(LOG_TAG, "Credits string: " + creditsJsonStr);
+            //Log.v(LOG_TAG, "Credits string: " + creditsJsonStr);
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Error ", e);
+            //Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the movies data, there's no point in attemping
             // to parse it.
             return null;
@@ -125,7 +126,7 @@ public class FetchCreditsTask extends AsyncTask<String, Void, ArrayList<MovieCre
                 try {
                     reader.close();
                 } catch (final IOException e) {
-                    Log.e(LOG_TAG, "Error closing stream", e);
+                    //Log.e(LOG_TAG, "Error closing stream", e);
                 }
             }
         }
@@ -133,7 +134,7 @@ public class FetchCreditsTask extends AsyncTask<String, Void, ArrayList<MovieCre
         try {
             return getCreditsDataFromJson(creditsJsonStr);
         } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
+            //Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }
 
@@ -169,8 +170,8 @@ public class FetchCreditsTask extends AsyncTask<String, Void, ArrayList<MovieCre
         }
 
         for (MovieCreditsModel movieCreditsModel : credits) {
-            Log.v(LOG_TAG, "CREDITS character: " + movieCreditsModel.mCharacter);
-            Log.v(LOG_TAG, "CREDITS NAME: " + movieCreditsModel.mName);
+            //Log.v(LOG_TAG, "CREDITS character: " + movieCreditsModel.mCharacter);
+            //Log.v(LOG_TAG, "CREDITS NAME: " + movieCreditsModel.mName);
         }
         return credits;
 
@@ -179,7 +180,7 @@ public class FetchCreditsTask extends AsyncTask<String, Void, ArrayList<MovieCre
     @Override
     protected void onPostExecute(ArrayList<MovieCreditsModel> result) {
 
-        Log.v(LOG_TAG, "TASK POST EXECUTE");
+        //Log.v(LOG_TAG, "TASK POST EXECUTE");
         if(result != null){
             mCreditsAdapter.clear();
             for(MovieCreditsModel elem: result) {

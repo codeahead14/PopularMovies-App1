@@ -48,6 +48,6 @@ public class CreditsActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         super.onBackPressed();
-        //overridePendingTransition(R.anim.slide_down_info, R.anim.no_change);
+        overridePendingTransition(R.anim.slide_down_info, R.anim.no_change);
     }
 }

@@ -32,6 +32,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
     private ProgressDialog progress;
     private Activity mActivity;
     private OnMovieDataFetchFinished fetchFinishedCallback;
+    private String fetchType = null;
+    private String searchQuery = null;
 
     // Page Number for Endless Scrolling
     private String pageNumber = "1";
@@ -55,9 +57,10 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
     private static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";
     private static final String GZIP_ENCODING = "gzip";
 
-    public FetchMovieTask(Activity activity, OnMovieDataFetchFinished callback){
+    public FetchMovieTask(Activity activity, OnMovieDataFetchFinished callback, String fetchType){
         this.mActivity = activity;
         this.fetchFinishedCallback = callback;
+        this.fetchType = fetchType;
     }
 
     private static void requestDecompression(HttpURLConnection conn) {
@@ -70,14 +73,28 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
 
         //for(int i=1; i<=PAGE_LIMIT; i++) {
             Uri.Builder builder = new Uri.Builder();
-            builder.scheme("http")
-                    .authority("api.themoviedb.org")
-                    .appendPath("3")
-                    .appendPath("discover")
-                    .appendPath("movie")
-                    .appendQueryParameter("sort_by", sort_by)
-                    .appendQueryParameter("page", pageNum)
-                    .appendQueryParameter("api_key", mActivity.getString(R.string.api_key));
+
+            if( this.fetchType.compareTo("fetchMovies") == 0) {
+                Log.v(LOG_TAG2,this.fetchType);
+                builder.scheme("http")
+                        .authority("api.themoviedb.org")
+                        .appendPath("3")
+                        .appendPath("discover")
+                        .appendPath("movie")
+                        .appendQueryParameter("sort_by", sort_by)
+                        .appendQueryParameter("page", pageNum)
+                        .appendQueryParameter("api_key", mActivity.getString(R.string.api_key));
+            } else if( this.fetchType.compareTo("searchQuery") == 0) {
+                Log.v(LOG_TAG2,"movie: "+sort_by);
+                builder.scheme("http")
+                        .authority("api.themoviedb.org")
+                        .appendPath("3")
+                        .appendPath("search")
+                        .appendPath("movie")
+                        .appendQueryParameter("query",sort_by)
+                        .appendQueryParameter("api_key", mActivity.getString(R.string.api_key));
+            }
+
             inp_url = builder.build().toString();
 
             URL url = new URL(inp_url);
@@ -131,12 +148,17 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
     protected ArrayList<MovieModel> doInBackground(String... params) {
         Log.v(LOG_TAG2,"in background");
         try {
-            if(params[0].equals("Most Popular"))
-                sort_by = "popularity.desc";
-            else if(params[0].equals("Highest Rated"))
-                sort_by = "vote_average.asc";
+            if (params.length == 2) {
+                if (params[0].equals("Most Popular"))
+                    sort_by = "popularity.desc";
+                else if (params[0].equals("Highest Rated"))
+                    sort_by = "vote_average.asc";
 
-            pageNumber = params[1];
+                pageNumber = params[1];
+            } else if (params.length == 1) {
+                pageNumber = "0";
+                sort_by = params[0];
+            }
             return getMovies(sort_by, pageNumber);
         } catch (IOException e) {
             JSONResponse = null;

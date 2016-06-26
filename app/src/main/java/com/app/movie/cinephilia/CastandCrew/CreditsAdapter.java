@@ -69,7 +69,6 @@ public class CreditsAdapter extends ArrayAdapter<MovieCreditsModel> {
         Picasso.with(mContext)
                 .load(url)
                 .transform(new CircleTransform())
-                .networkPolicy(NetworkPolicy.OFFLINE)
                 .into(viewHolder.profile_picture);
 
 

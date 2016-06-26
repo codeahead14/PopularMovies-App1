@@ -9,6 +9,7 @@
     <string name="sort_order">Sort</string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="title_user_settings">UserSettings</string>
+    <string name="title_search_activity">Search</string>
     <string name="userRatings">User Ratings</string>
     <string name="voteCount">Votes</string>
     <string name="releaseDate">Released</string>

@@ -74,9 +74,13 @@
     <color name="teal900">#004D40</color>
     <color name="cyan300">#4DD0E1</color>
     <color name="cyan500">#00BCD4</color>
+    <color name="deepPurple200">#B39DDB</color>
     <color name="deepPurple300">#9575CD</color>
+    <color name="deepPurple400">#7E57C2</color>
     <color name="deepPurple500">#673AB7</color>
+    <color name="deepPurple600">#5E35B1</color>
     <color name="deepPurple700">#512DA8</color>
+    <color name="deepPurple800">#4527A0</color>
     <color name="deepPurple900">#311B92</color>
     <color name="blue100">#BBDEFB</color>
     <color name="blue200">#90CAF9</color>

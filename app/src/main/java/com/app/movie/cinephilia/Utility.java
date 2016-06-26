@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -20,7 +21,7 @@ import java.io.IOException;
 /**
  * Created by GAURAV on 22-01-2016.
  */
-public class Utility extends BroadcastReceiver{
+public class Utility{//} extends BroadcastReceiver{
     private Context mContext;
     private ConnectivityManager connectivityManager;
     private static View parentLayout;
@@ -29,23 +30,12 @@ public class Utility extends BroadcastReceiver{
         parentLayout = view;
     }
 
-    @Override
-    public void onReceive(Context context, Intent intent){
-        if(!hasConnection(context)){
-            //alert(context);
-            Snackbar.make(parentLayout, "NO INTERNET CCONNECTION",
-                                    Snackbar.LENGTH_LONG).show();
-        }
-    }
-
     public static boolean hasConnection(Context context) {
         ConnectivityManager cm =
                 (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-
-        return isConnected;
+         return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
     }
 
 
@@ -60,6 +50,12 @@ public class Utility extends BroadcastReceiver{
         builder.setPositiveButton("OK", null);
         builder.setNegativeButton("Cancel", null);
         builder.show();
+    }
 
+    /* TO get the year */
+    public static String formatDate(String date){
+        String[] dateArray = date.split("-");
+        Log.v("Utility",dateArray[dateArray.length-1]);
+        return dateArray[dateArray.length-1];
     }
 }

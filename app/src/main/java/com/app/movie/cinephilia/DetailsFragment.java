@@ -181,7 +181,7 @@ public class DetailsFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     if (mHasCredits){
-                        Toast.makeText(getActivity(), "Credits Fetch Completed", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getActivity(), "Credits Fetch Completed", Toast.LENGTH_SHORT).show();
                         mCreditsData = mCreditsAdapter.getCreditsData();
                         Intent intent = new Intent(getActivity(), CreditsActivity.class);
                         intent.putExtra("CreditsData", mCreditsData);
@@ -208,7 +208,7 @@ public class DetailsFragment extends Fragment {
 
             // Set release date
             TextView releaseDateTextView = (TextView) rootView.findViewById(R.id.text_view_release_date);
-            releaseDateTextView.setText(movie.getReleaseDate());
+            releaseDateTextView.setText(Utility.formatDate( movie.getReleaseDate() ));
 
             // Set user rating
             TextView userRatingTextView = (TextView) rootView.findViewById(R.id.text_view_user_rating);
@@ -220,7 +220,7 @@ public class DetailsFragment extends Fragment {
 
             // Set Vote Count
             TextView voteCountTextView = (TextView) rootView.findViewById(R.id.text_view_vote_count);
-            voteCountTextView.setText(getString(R.string.voteCount) + ": " + movie.getVoteCount());
+            voteCountTextView.setText(movie.getVoteCount());
 
             final TextView trailerTitle = (TextView) rootView.findViewById(R.id.trailer_head);
             trailerTitle.setText("TRAILERS");
@@ -298,8 +298,9 @@ public class DetailsFragment extends Fragment {
                 buildFavouriteMoviesUriWithMovieId(movieId), null, null, null, null);
         if (movieCursor.getCount() == 0)
             return false;
-        else
+        else {
             return true;
+        }
     }
 
     public void updateDatabase(boolean isFavourite, int movieId, View view) {
@@ -316,6 +317,7 @@ public class DetailsFragment extends Fragment {
             contentValues.put(FavoriteMoviesEntry.COLUMN_MOVIE_ID, movie.getId());
             contentValues.put(FavoriteMoviesEntry.COLUMN_ORIGINAL_TITLE, movie.getTitle());
             contentValues.put(FavoriteMoviesEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
+            Log.v(TAG,movie.getReleaseDate());
             contentValues.put(FavoriteMoviesEntry.COLUMN_OVERVIEW, movie.getSynopsis());
             contentValues.put(FavoriteMoviesEntry.COLUMN_VOTE_AVG, movie.getUserRating());
             contentValues.put(FavoriteMoviesEntry.COLUMN_VOTE_COUNT, movie.getVoteCount());
@@ -370,18 +372,6 @@ public class DetailsFragment extends Fragment {
                     }
                 }
             } else if (event.getName().equals("FetchTrailerTask")) {
-                /*if(mTrailerAdapter.getCount()>0) {
-                    emptyCardTrailers.setVisibility(View.GONE);
-                    mHasTrailers=true;
-                    youtubeId = mTrailerAdapter.getItem(0).mKey;
-                    //if (mShareActionProvider != null)
-                        //mShareActionProvider.setShareIntent(createShareUrlIntent(youtubeId));
-                    //trailerUrl = youtubeId;
-                    for (int iter = 0; iter < mTrailerAdapter.getCount(); iter++) {
-                        View item = mTrailerAdapter.getView(iter, null, null);
-                        mLinearLayoutTrailer.addView(item);
-                    }
-                }*/
                 if(mTrailerAdapter.getItemCount() > 0){
                     emptyCardTrailers.setVisibility(View.GONE);
                     mHasTrailers=true;
