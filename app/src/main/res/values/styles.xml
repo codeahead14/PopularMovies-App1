@@ -7,9 +7,13 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="toolbarStyle">@style/Toolbar</item>
-        <item name="android:windowExitTransition">@transition/grid_exit</item>
         <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowSharedElementEnterTransition">@transition/changebounds</item>
+        <item name="android:windowSharedElementExitTransition">@transition/changebounds</item>
     </style>
+
+    <!--<item name="android:windowExitTransition">@transition/grid_exit</item>
+    <item name="android:windowEnterAnimation">@transition/grid_exit</item>-->
 
     <!-- Main Activity Toolbar style -->
     <style name="Toolbar" parent="Widget.AppCompat.Toolbar">
@@ -43,15 +47,16 @@
     </style>
 
     <style name="MyCustomTabLayout" parent="Widget.Design.TabLayout">
-        <item name="tabTextAppearance">@style/MyCustomTabText</item>
+        <item name="android:textAppearance">@style/MyCustomTabText</item>
         <item name="tabSelectedTextColor">@color/white</item>
-        <item name="tabIndicatorColor">@color/colorPrimary</item>
+        <item name="tabIndicatorColor">@color/white</item>
     </style>
 
     <style name="MyCustomTabText" parent="TextAppearance.AppCompat.Button">
-        <item name="android:textSize">14sp</item>
-        <item name="android:color">@color/lightGrey</item>
-        <item name="textAllCaps">false</item>
+        <item name="android:textSize">12sp</item>
+
+        <item name="android:textColor">@color/grey300</item>
+        <item name="textAllCaps">true</item>
         <!--<item name="android:paddingLeft">4dp</item>-->
     </style>
 

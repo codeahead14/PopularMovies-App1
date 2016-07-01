@@ -1,11 +1,15 @@
 package com.app.movie.cinephilia;
 
+import android.animation.Animator;
+import android.animation.LayoutTransition;
+import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Path;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -22,19 +26,28 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
+import android.transition.Slide;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
-public class MainActivity extends AppCompatActivity implements GridViewFragment.Callback {
+import org.w3c.dom.Text;
+
+public class MainActivity extends AppCompatActivity implements Callback {
 
     private static final String msg = "Android: ";
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
@@ -44,6 +57,16 @@ public class MainActivity extends AppCompatActivity implements GridViewFragment.
     private Context context;
     BroadcastReceiver broadcastReceiver;
     private boolean connectionLostFlag = false;
+    private TextView searchText;
+    private EditText searchEditText;
+
+    /* Member Variables for Interpolator */
+    private Interpolator mInterpolators;
+    /* Path for out (growing) animation, from 20% to 100%. */
+    private Path mPathOut;
+    private static final int INITIAL_DURATION_MS = 500;
+    private Animator defaultAppearingAnim, defaultDisappearingAnim;
+    private ViewGroup viewGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +79,23 @@ public class MainActivity extends AppCompatActivity implements GridViewFragment.
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
+        viewGroup = (ViewGroup) findViewById(R.id.main_activity);
+
+        searchText = (TextView) findViewById(R.id.search_box);
+        searchText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mInterpolators = AnimationUtils.loadInterpolator(MainActivity.this
+                                ,android.R.interpolator.linear_out_slow_in);
+                Intent intent = new Intent(MainActivity.this, MovieSearchActivity.class);
+                /*View sharedView = searchText;
+                ActivityOptions transitionActivityOptions = ActivityOptions
+                        .makeSceneTransitionAnimation(MainActivity.this, sharedView, sharedView.getTransitionName());
+                startActivity(intent, transitionActivityOptions.toBundle());*/
+                startActivity(intent);
+                //(mInterpolators, INITIAL_DURATION_MS, mPathOut);
+            }
+        });
 
         // Get the ViewPager and set it's PagerAdapter so that it can display items
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -70,6 +110,13 @@ public class MainActivity extends AppCompatActivity implements GridViewFragment.
             TabLayout.Tab tab = tabLayout.getTabAt(i);
             tab.setCustomView(movieFragmentPagerAdapter.getTabView(i));
         }
+        tabLayout.setSelectedTabIndicatorColor(getResources().getColor(R.color.lightGrey));
+
+        /*final LayoutTransition transitioner = new LayoutTransition();
+        viewGroup.setLayoutTransition(transitioner);
+        defaultAppearingAnim = transitioner.getAnimator(LayoutTransition.CHANGE_APPEARING);
+        defaultDisappearingAnim =
+                transitioner.getAnimator(LayoutTransition.CHANGE_DISAPPEARING);*/
 
         if (findViewById(R.id.detail_container) != null) {
             mTwoPane = true;
@@ -80,7 +127,24 @@ public class MainActivity extends AppCompatActivity implements GridViewFragment.
             }
         } else {
             mTwoPane = false;
+            setupWindowAnimations();
         }
+    }
+
+/*    public void fade(View view){
+        ImageView image = (ImageView)findViewById(R.id.imageView);
+        Animation animation1 = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade);
+        image.startAnimation(animation1);
+    }*/
+
+    private void setupWindowAnimations() {
+        Fade fade = new Fade();
+        fade.setDuration(1000);
+        getWindow().setEnterTransition(fade);
+
+        Slide slide = new Slide();
+        slide.setDuration(1000);
+        getWindow().setReturnTransition(slide);
     }
 
     @Override
@@ -123,6 +187,10 @@ public class MainActivity extends AppCompatActivity implements GridViewFragment.
         if (id == R.id.action_search) {
             Intent intent = new Intent(this, MovieSearchActivity.class);
             startActivity(intent);
+            //this.overridePendingTransition(R.anim.slide_down_info,R.anim.slide_up_info);
+            return true;
+        } else if (id == android.R.id.home) {
+            supportFinishAfterTransition();
             return true;
         }
 
@@ -151,11 +219,16 @@ public class MainActivity extends AppCompatActivity implements GridViewFragment.
         } else {
             Intent intent = new Intent(this, DetailsActivity.class);
             intent.putExtra(Intent.EXTRA_TEXT, item);
+            ImageView posterImg = (ImageView) findViewById(R.id.image_view_poster);
 
-            Bundle bundle = ActivityOptionsCompat
-                    .makeSceneTransitionAnimation(this)
-                    .toBundle();
-            startActivity(intent,bundle);
+            //ActivityOptionsCompat options = ActivityOptionsCompat.
+              //      makeSceneTransitionAnimation(this, (View)posterImg, "profile");
+
+            //ActivityOptionsCompat options = ActivityOptionsCompat.
+              //              makeSceneTransitionAnimation(this);
+            //startActivity(intent,options.toBundle());
+            startActivity(intent);
+            overridePendingTransition(R.transition.slide_exit,R.transition.slide_enter);
         }
     }
 

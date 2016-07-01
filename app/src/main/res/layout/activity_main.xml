@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_activity"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -23,6 +24,23 @@
             android:fitsSystemWindows="true"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
+            <TextView
+                android:id="@+id/search_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Search Cinephilia"
+                android:textSize="16sp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginTop="8dp"
+                android:padding="6dp"
+                android:paddingLeft="12dp"
+                android:paddingStart="12dp"
+                android:background="@drawable/edittext_background"
+                android:transitionName="searchbox_transition"/>
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -30,7 +48,8 @@
                 android:background="@color/colorPrimary"
                 android:minHeight="?attr/actionBarSize"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                android:titleTextAppearance="@style/TextAppearance.AppCompat.Title" />
+                android:titleTextAppearance="@style/TextAppearance.AppCompat.Title"
+                android:visibility="gone"/>
 
             <android.support.design.widget.TabLayout
                 android:id="@+id/sliding_tabs"
@@ -38,7 +57,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/tabColor"
-                android:minHeight="?attr/actionBarSize"
                 android:padding="0dp"
                 app:tabGravity="fill"
                 app:tabMode="scrollable" />
@@ -55,7 +73,7 @@
 
     </LinearLayout>
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/searchContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -103,6 +121,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-    </RelativeLayout>
+    </RelativeLayout>-->
 
 </RelativeLayout>

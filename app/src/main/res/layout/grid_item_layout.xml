@@ -15,9 +15,10 @@
         android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/grid_item_image"
+            android:id="@+id/image_view_poster"
             android:layout_width="match_parent"
             android:layout_height="@dimen/poster_height"
+            android:transitionName="profile"
             android:adjustViewBounds="true"
             android:paddingTop="@dimen/margin_default"
             android:paddingBottom="@dimen/margin_inline"/>

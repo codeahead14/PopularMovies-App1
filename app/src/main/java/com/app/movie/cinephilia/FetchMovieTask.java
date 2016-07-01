@@ -75,23 +75,29 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
             Uri.Builder builder = new Uri.Builder();
 
             if( this.fetchType.compareTo("fetchMovies") == 0) {
-                Log.v(LOG_TAG2,this.fetchType);
                 builder.scheme("http")
                         .authority("api.themoviedb.org")
                         .appendPath("3")
-                        .appendPath("discover")
+                        //.appendPath("discover")
                         .appendPath("movie")
-                        .appendQueryParameter("sort_by", sort_by)
-                        .appendQueryParameter("page", pageNum)
+                        .appendPath(sort_by)
+                        //.appendQueryParameter("sort_by", sort_by)
+                        //.appendQueryParameter("page", pageNum)
                         .appendQueryParameter("api_key", mActivity.getString(R.string.api_key));
             } else if( this.fetchType.compareTo("searchQuery") == 0) {
-                Log.v(LOG_TAG2,"movie: "+sort_by);
                 builder.scheme("http")
                         .authority("api.themoviedb.org")
                         .appendPath("3")
                         .appendPath("search")
                         .appendPath("movie")
                         .appendQueryParameter("query",sort_by)
+                        .appendQueryParameter("api_key", mActivity.getString(R.string.api_key));
+            } else if( this.fetchType.compareTo("fetchSearchedMovie") == 0) {
+                builder.scheme("http")
+                        .authority("api.themoviedb.org")
+                        .appendPath("3")
+                        .appendPath("movie")
+                        .appendPath(sort_by)
                         .appendQueryParameter("api_key", mActivity.getString(R.string.api_key));
             }
 
@@ -126,6 +132,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
             }
             responseJSONStr = buffer.toString();
             try {
+                Log.v(LOG_TAG2,Integer.toString(responseJSONStr.length()));
                 movies.addAll(parseResult(responseJSONStr));
             }catch (JSONException e) {
                 Log.e(LOG_TAG2, e.getMessage(), e);
@@ -150,9 +157,9 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
         try {
             if (params.length == 2) {
                 if (params[0].equals("Most Popular"))
-                    sort_by = "popularity.desc";
+                    sort_by = "popular";
                 else if (params[0].equals("Highest Rated"))
-                    sort_by = "vote_average.asc";
+                    sort_by = "top_rated";
 
                 pageNumber = params[1];
             } else if (params.length == 1) {
@@ -191,22 +198,39 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieModel
 
     private ArrayList<MovieModel> parseResult(String result) throws JSONException {
         try {
+            //Log.v(LOG_TAG2,"parsing result:"+result);
             JSONObject response = new JSONObject(result);
-            JSONArray posts = response.getJSONArray("results");
-            ArrayList<MovieModel> items = new ArrayList<>();
-            for (int i = 0; i < posts.length(); i++) {
-                JSONObject post = posts.getJSONObject(i);
-                MovieModel movie = new MovieModel(post.getString(ORIGINAL_TITLE_KEY),
-                        post.getDouble(VOTE_AVERAGE_KEY),
-                        post.getString(RELEASE_DATE_KEY),
-                        post.getString(OVERVIEW_KEY),
-                        post.getString(VOTE_COUNT),
-                        post.getString(BACKDROP_PATH_KEY),
-                        post.getInt(ID),
-                        post.getString(POSTER_PATH_KEY));
-                items.add(movie);
+
+            if (this.fetchType.compareTo("fetchMovies") == 0 || this.fetchType.compareTo("searchQuery") == 0) {
+                JSONArray posts = response.getJSONArray("results");
+                ArrayList<MovieModel> items = new ArrayList<>();
+                for (int i = 0; i < posts.length(); i++) {
+                    JSONObject post = posts.getJSONObject(i);
+                    MovieModel movie = new MovieModel(post.getString(ORIGINAL_TITLE_KEY),
+                            post.getDouble(VOTE_AVERAGE_KEY),
+                            post.getString(RELEASE_DATE_KEY),
+                            post.getString(OVERVIEW_KEY),
+                            post.getString(VOTE_COUNT),
+                            post.getString(BACKDROP_PATH_KEY),
+                            post.getInt(ID),
+                            post.getString(POSTER_PATH_KEY));
+                    Log.v(LOG_TAG2, post.getString(ORIGINAL_TITLE_KEY));
+                    items.add(movie);
+                }
+                return items;
+            } else if (this.fetchType.compareTo("fetchSearchedMovie") == 0){
+                ArrayList<MovieModel> items = new ArrayList<>();
+                MovieModel movieModel = new MovieModel(response.getString(ORIGINAL_TITLE_KEY),
+                        response.getDouble(VOTE_AVERAGE_KEY),
+                        response.getString(RELEASE_DATE_KEY),
+                        response.getString(OVERVIEW_KEY),
+                        response.getString(VOTE_COUNT),
+                        response.getString(BACKDROP_PATH_KEY),
+                        response.getInt(ID),
+                        response.getString(POSTER_PATH_KEY));
+                items.add(movieModel);
+                return items;
             }
-            return items;
         } catch (JSONException e) {
             e.printStackTrace();
         }

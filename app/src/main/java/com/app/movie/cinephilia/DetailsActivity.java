@@ -8,6 +8,8 @@ import android.os.Bundle;
 
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Fade;
+import android.transition.Slide;
 
 public class DetailsActivity extends AppCompatActivity{
 
@@ -20,5 +22,22 @@ public class DetailsActivity extends AppCompatActivity{
                     .add(R.id.detail_container, new DetailsFragment())
                     .commit();
         }
+        //setupWindowAnimations();
+    }
+
+
+    /*private void setupWindowAnimations() {
+        Fade fade = new Fade();
+        fade.setDuration(1000);
+        getWindow().setEnterTransition(fade);
+
+        Slide slide = new Slide();
+        slide.setDuration(1000);
+        getWindow().setReturnTransition(fade);
+    }*/
+
+    @Override
+    public void onBackPressed(){
+        supportFinishAfterTransition();
     }
 }

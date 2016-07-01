@@ -70,10 +70,10 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
         updateGrid();
     }
 
-    public interface Callback {
+    /*public interface Callback {
         void onItemSelected(MovieModel item);
         void defaultItemSelected(MovieModel item);
-    }
+    }*/
 
     public GridViewFragment() {
     }

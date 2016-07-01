@@ -22,9 +22,9 @@ public class MovieFragmentPagerAdapter extends FragmentPagerAdapter {
     final int PAGE_COUNT = 3;
     private String tabTitles[] = new String[] { "Popular", "Highest Rated", "Favorites" };
     private int[] imgResId = {
-            R.drawable.ic_trending_up_black_18dp,
-            R.drawable.ic_thumb_up_black_18dp,
-            R.drawable.ic_favorite_black_18dp
+            R.drawable.ic_trending_up_white_18dp,
+            R.drawable.ic_thumb_up_white_18dp,
+            R.drawable.ic_favorite_white_18dp
     };
     private Context context;
 
@@ -37,7 +37,7 @@ public class MovieFragmentPagerAdapter extends FragmentPagerAdapter {
         // Given you have a custom layout in `res/layout/custom_tab.xml` with a TextView and ImageView
         View v = LayoutInflater.from(context).inflate(R.layout.custom_tab, null);
         TextView tv = (TextView) v.findViewById(R.id.textView);
-        tv.setTextColor(context.getResources().getColor(R.color.black));
+        tv.setTextColor(context.getResources().getColor(R.color.lightGrey));
         tv.setText(tabTitles[position]);
         //tv.setTextColor(ContextCompat.getColor(this.context, R.color.colorAccent));
         ImageView img = (ImageView) v.findViewById(R.id.imgView);

@@ -71,7 +71,7 @@ public class GridViewAdapter extends ArrayAdapter<MovieModel> {
             LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
             holder = new ViewHolder();
-            holder.imageView = (ImageView) row.findViewById(R.id.grid_item_image);
+            holder.imageView = (ImageView) row.findViewById(R.id.image_view_poster);
             holder.textView = (TextView) row.findViewById(R.id.grid_item_text);
             holder.releaseDateText = (TextView) row.findViewById(R.id.release_date_grid);
             row.setTag(holder);
