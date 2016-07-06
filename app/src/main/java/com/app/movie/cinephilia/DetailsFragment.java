@@ -258,7 +258,14 @@ public class DetailsFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     isFavourtie(movie.getId());
-                    updateDatabase(isFavourtie(movie.getId()), movie.getId(), view);
+                    updateDatabase(isFavourtie(movie.getId()), false, movie.getId(), view);
+                }
+            });
+
+            fab2.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view) {
+                    updateDatabase(false,isWatched(movie.getId()), movie.getId(), view);
                 }
             });
 
@@ -297,7 +304,7 @@ public class DetailsFragment extends Fragment {
     public boolean isFavourtie(int movieId) {
         resolver = getContext().getContentResolver();
         Cursor movieCursor = resolver.query(MovieContract.FavoriteMoviesEntry.
-                buildFavouriteMoviesUriWithMovieId(movieId), null, null, null, null);
+                buildFavouriteMoviesUriWithMovieId("yes",movieId), null, null, null, null);
         if (movieCursor.getCount() == 0)
             return false;
         else {
@@ -305,27 +312,46 @@ public class DetailsFragment extends Fragment {
         }
     }
 
-    public void updateDatabase(boolean isFavourite, int movieId, View view) {
+    public boolean isWatched(int movieId) {
+        resolver = getContext().getContentResolver();
+        Cursor movieCursor = resolver.query(MovieContract.FavoriteMoviesEntry.
+                buildFavouriteMoviesUriWithMovieId("yes",movieId), null, null, null, null);
+        if (movieCursor.getCount() == 0)
+            return false;
+        else {
+            return true;
+        }
+    }
+
+    public void updateDatabase(boolean isFavourite, boolean isWatched, int movieId, View view) {
         if (isFavourite) {
             /* Movie already in Favourites - Delete the movie from DB*/
             resolver.delete(MovieContract.FavoriteMoviesEntry.
-                    buildFavouriteMoviesUriWithMovieId(movieId), null, null);
+                    buildFavouriteMoviesUriWithMovieId("yes",movieId), null, null);
             Snackbar.make(view, "REMOVED FROM FAVOURITES!", Snackbar.LENGTH_SHORT)
                     .setAction("Action", null).show();
             fab1.setImageResource(R.drawable.ic_favorite_border_white_24dp);
-        } else {
+        } else if (isWatched){
+            /* Movie already in Favourites - Delete the movie from DB*/
+            resolver.delete(MovieContract.FavoriteMoviesEntry.
+                    buildFavouriteMoviesUriWithMovieId("yes",movieId), null, null);
+            Snackbar.make(view, "REMOVED FROM FAVOURITES!", Snackbar.LENGTH_SHORT)
+                    .setAction("Action", null).show();
+            fab1.setImageResource(R.drawable.ic_favorite_border_white_24dp);
+        }else {
             /*Add values into DB*/
             ContentValues contentValues = new ContentValues();
             contentValues.put(FavoriteMoviesEntry.COLUMN_MOVIE_ID, movie.getId());
             contentValues.put(FavoriteMoviesEntry.COLUMN_ORIGINAL_TITLE, movie.getTitle());
             contentValues.put(FavoriteMoviesEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
-            Log.v(TAG,movie.getReleaseDate());
             contentValues.put(FavoriteMoviesEntry.COLUMN_OVERVIEW, movie.getSynopsis());
             contentValues.put(FavoriteMoviesEntry.COLUMN_VOTE_AVG, movie.getUserRating());
             contentValues.put(FavoriteMoviesEntry.COLUMN_VOTE_COUNT, movie.getVoteCount());
             contentValues.put(FavoriteMoviesEntry.COLUMN_POSTER_URL, movie.getPosterUrl());
             contentValues.put(FavoriteMoviesEntry.COLUMN_BACKDROP_URL, movie.getBackdropUrl());
-
+            contentValues.put(FavoriteMoviesEntry.COLUMN_FAVORITES,"yes");
+            contentValues.put(FavoriteMoviesEntry.COLUMN_WATCHED,"no");
+            contentValues.put(FavoriteMoviesEntry.COLUMN_TO_WATCH,"no");
             resolver.insert(FavoriteMoviesEntry.CONTENT_URI, contentValues);
 
             //Toast.makeText(getContext(), "ADDED TO FAVOURITES!", Toast.LENGTH_SHORT).show();

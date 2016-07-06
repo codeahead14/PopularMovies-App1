@@ -28,6 +28,12 @@ public class MovieProvider extends ContentProvider {
     static final int FAVOURITES = 100;
     static final int FAVOURITE_WITH_ID = 101;
 
+    // Added to include movies watched
+    static final int WATCHED = 102;
+    static final int WATCHED_WITH_ID = 103;
+    static final int TO_WATCH = 104;
+    static final int TO_WATCH_WITH_ID = 105;
+
     static {
         sQueryBuilder = new SQLiteQueryBuilder();
         sQueryBuilder.setTables(FavoriteMoviesEntry.TABLE_NAME);
@@ -38,7 +44,11 @@ public class MovieProvider extends ContentProvider {
         // URI.  It's common to use NO_MATCH as the code for this case. Add the constructor below.
         final UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         mUriMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_FAVOURITES,FAVOURITES);
-        mUriMatcher.addURI(MovieContract.CONTENT_AUTHORITY,MovieContract.PATH_FAVOURITES+"/#", FAVOURITE_WITH_ID);
+        mUriMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_WATCHED,WATCHED);
+        mUriMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TO_WATCH,TO_WATCH);
+        mUriMatcher.addURI(MovieContract.CONTENT_AUTHORITY,MovieContract.PATH_FAVOURITES+"/*", FAVOURITE_WITH_ID);
+        mUriMatcher.addURI(MovieContract.CONTENT_AUTHORITY,MovieContract.PATH_WATCHED+"/#", WATCHED_WITH_ID);
+        mUriMatcher.addURI(MovieContract.CONTENT_AUTHORITY,MovieContract.PATH_TO_WATCH  +"/#", TO_WATCH_WITH_ID);
         return mUriMatcher;
     }
 
@@ -58,6 +68,16 @@ public class MovieProvider extends ContentProvider {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         FavoriteMoviesEntry.TABLE_NAME,
                         projection,
+                        FavoriteMoviesEntry.COLUMN_FAVORITES + "= ?",
+                        new String[]{"yes"},
+                        null,
+                        null,
+                        sortOrder);
+                break;}
+            case WATCHED:{
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        FavoriteMoviesEntry.TABLE_NAME,
+                        projection,
                         selection,
                         selectionArgs,
                         null,
@@ -68,8 +88,9 @@ public class MovieProvider extends ContentProvider {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         FavoriteMoviesEntry.TABLE_NAME,
                         projection,
-                        FavoriteMoviesEntry.COLUMN_MOVIE_ID + "= ?",
-                        new String[]{String.valueOf(ContentUris.parseId(uri))},
+                        FavoriteMoviesEntry.COLUMN_FAVORITES + "= ? AND " +
+                                FavoriteMoviesEntry.COLUMN_MOVIE_ID + "= ?",
+                        new String[]{"yes",String.valueOf(ContentUris.parseId(uri))},
                         null,
                         null,
                         sortOrder);

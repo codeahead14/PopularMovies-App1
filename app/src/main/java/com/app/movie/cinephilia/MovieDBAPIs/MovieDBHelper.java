@@ -3,6 +3,8 @@ package com.app.movie.cinephilia.MovieDBAPIs;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
 import com.app.movie.cinephilia.MovieDBAPIs.MovieContract.FavoriteMoviesEntry;
 
 /**
@@ -15,6 +17,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
 
     /** **/
     private static MovieDBHelper sInstance;
+    public static String SQL_CREATE_FAVMOVIE_TABLE = null;
 
     /* Usage for Singleton Pattern
      * In any activity just pass the context and use the singleton method
@@ -39,7 +42,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase){
-        final String SQL_CREATE_FAVMOVIE_TABLE = "Create TABLE " + FavoriteMoviesEntry.TABLE_NAME+"("
+        SQL_CREATE_FAVMOVIE_TABLE = "Create TABLE " + FavoriteMoviesEntry.TABLE_NAME+"("
                         + FavoriteMoviesEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                         + FavoriteMoviesEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, "
                         + FavoriteMoviesEntry.COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL, "
@@ -49,8 +52,12 @@ public class MovieDBHelper extends SQLiteOpenHelper {
                         + FavoriteMoviesEntry.COLUMN_VOTE_COUNT + " TEXT, "
                         + FavoriteMoviesEntry.COLUMN_POSTER_URL + " TEXT, "
                         + FavoriteMoviesEntry.COLUMN_BACKDROP_URL + " TEXT, "
+                        + FavoriteMoviesEntry.COLUMN_FAVORITES + " TEXT, "
+                        + FavoriteMoviesEntry.COLUMN_WATCHED + " TEXT, "
+                        + FavoriteMoviesEntry.COLUMN_TO_WATCH + " TEXT, "
                         + " UNIQUE (" + FavoriteMoviesEntry.COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
 
+        Log.v("MovieDBHelper",SQL_CREATE_FAVMOVIE_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_FAVMOVIE_TABLE);
     }
 

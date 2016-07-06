@@ -5,6 +5,7 @@ import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.text.format.Time;
+import android.util.Log;
 
 /**
  * Created by GAURAV on 19-01-2016.
@@ -18,6 +19,8 @@ public class MovieContract {
     // For instance, content://com.app.movie.cinephilia/favouriteMovies/ is a valid path for
     // looking at weather data.
     public static final String PATH_FAVOURITES = "favouriteMovies";
+    public static final String PATH_WATCHED = "watchedMovies";
+    public static final String PATH_TO_WATCH = "toWatchMovies";
 
     public static long normalizeDate(long startDate) {
         // normalize the start date to the beginning of the (UTC) day
@@ -51,9 +54,13 @@ public class MovieContract {
         public static final String COLUMN_POSTER_URL = "poster_url";
         public static final String COLUMN_BACKDROP_URL = "backdrop_url";
 
+        // Adding Columns for identifying Favorites, Watched and To Watch Movies
+        public static final String COLUMN_FAVORITES = "is_favorite";
+        public static final String COLUMN_WATCHED = "is_watched";
+        public static final String COLUMN_TO_WATCH = "to_watch";
+
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_FAVOURITES).build();
-
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVOURITES;
         public static final String CONTENT_ITEM_TYPE =
@@ -64,8 +71,15 @@ public class MovieContract {
         }
 
         // content://..../MovieId
-        public static Uri buildFavouriteMoviesUriWithMovieId(int MovieId) {
-            return CONTENT_URI.buildUpon().appendPath(Integer.toString(MovieId)).build();
+        public static Uri buildFavouriteMoviesUriWithMovieId(String boolVal,int MovieId) {
+            Log.v("MovieContract", CONTENT_URI.buildUpon()
+                    .appendQueryParameter(COLUMN_FAVORITES,boolVal)
+                    .appendQueryParameter(COLUMN_MOVIE_ID,Integer.toString(MovieId))
+                    .build().toString());
+            return CONTENT_URI.buildUpon()
+                    .appendQueryParameter(COLUMN_FAVORITES,boolVal)
+                    .appendQueryParameter(COLUMN_MOVIE_ID,Integer.toString(MovieId))
+                    .build();
         }
 
     }
