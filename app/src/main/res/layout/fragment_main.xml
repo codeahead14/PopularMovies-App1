@@ -21,7 +21,7 @@
             android:clickable="true"
             android:gravity="center"
             android:horizontalSpacing="4dp"
-            android:verticalSpacing="4dp" />
+            android:verticalSpacing="4dp"    />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

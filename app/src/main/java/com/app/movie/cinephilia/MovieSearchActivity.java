@@ -22,6 +22,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
@@ -50,8 +51,8 @@ public class MovieSearchActivity extends AppCompatActivity implements OnMovieDat
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_activity);
-        setupWindowAnimations();
-        Toolbar toolbar = (Toolbar) findViewById(R.id.searchToolbar);
+        //setupWindowAnimations();
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.searchToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -59,6 +60,29 @@ public class MovieSearchActivity extends AppCompatActivity implements OnMovieDat
         editText.setImeActionLabel("Done", KeyEvent.KEYCODE_ENTER);
         mSearchAdapter = new SearchListAdapter(this, R.layout.list_item_search, new ArrayList<MovieModel>());
         final LinearLayout emptyLayout = (LinearLayout) findViewById(R.id.emptyLayout);
+
+        final TextView searchbox = (TextView) findViewById(R.id.search_box);
+
+        /*Animation anim = AnimationUtils.loadAnimation(this,R.anim.zoom_enter);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                //editText.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                toolbar.setVisibility(View.VISIBLE);
+                editText.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        toolbar.startAnimation(anim);*/
 
         TextView.OnEditorActionListener editorActionListener = new TextView.OnEditorActionListener() {
             @Override

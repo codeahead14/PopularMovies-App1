@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.os.Parcelable;
@@ -142,6 +143,7 @@ public class GridViewFragment extends Fragment implements LoaderManager.LoaderCa
         dialog.setMessage("Fetching Awesomeness");
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
+        swipeRefreshLayout.setColorSchemeColors(Color.RED, Color.YELLOW, Color.BLUE);
         networkLayout = (RelativeLayout) rootView.findViewById(R.id.networkLayout);
         Button networkSettings = (Button) rootView.findViewById(R.id.networkButton);
         networkSettings.setOnClickListener(new View.OnClickListener() {

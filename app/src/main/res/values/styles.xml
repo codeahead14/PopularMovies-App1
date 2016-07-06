@@ -8,8 +8,6 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="toolbarStyle">@style/Toolbar</item>
         <item name="android:windowContentTransitions">true</item>
-        <item name="android:windowSharedElementEnterTransition">@transition/changebounds</item>
-        <item name="android:windowSharedElementExitTransition">@transition/changebounds</item>
     </style>
 
     <!--<item name="android:windowExitTransition">@transition/grid_exit</item>

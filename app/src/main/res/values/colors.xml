@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FF7C1E</color>   <!--#3f51b5</color>-->
+    <color name="colorPrimary">#F5771D</color>   <!--#3f51b5</color>-->
     <color name="colorPrimaryDark">#B24A00</color>   <!--#1a237e</color>-->
     <color name="colorAccent">#ffffff</color>
     <color name="colorFallbackAccentLight">#8CFFA4</color>
     <color name="colorFallbackAccentDark">#73D186</color>
-    <color name="tabColor">#FF7C1E</color>
+    <color name="tabColor">#F5771D</color>
     <color name="menuFab">#FFA000</color>
 
     <color name="colorAccentMain">#F06292</color>

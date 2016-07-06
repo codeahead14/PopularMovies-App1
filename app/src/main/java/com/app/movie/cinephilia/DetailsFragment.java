@@ -27,6 +27,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -186,7 +188,7 @@ public class DetailsFragment extends Fragment {
                         Intent intent = new Intent(getActivity(), CreditsActivity.class);
                         intent.putExtra("CreditsData", mCreditsData);
                         startActivity(intent);
-                        getActivity().overridePendingTransition(R.anim.slide_up_info, R.anim.no_change);
+                        //getActivity().overridePendingTransition(R.anim.slide_up_info, R.anim.no_change);
                     }
                 }
             });

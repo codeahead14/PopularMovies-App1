@@ -20,7 +20,7 @@ import android.widget.TextView;
  */
 public class MovieFragmentPagerAdapter extends FragmentPagerAdapter {
     final int PAGE_COUNT = 3;
-    private String tabTitles[] = new String[] { "Popular", "Highest Rated", "Favorites" };
+    private String tabTitles[] = new String[] { "Popular", "Top Rated", "Favorites" };
     private int[] imgResId = {
             R.drawable.ic_trending_up_white_18dp,
             R.drawable.ic_thumb_up_white_18dp,
@@ -54,16 +54,4 @@ public class MovieFragmentPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         return GridViewFragment.newInstance(position + 1);
     }
-
-    /*
-    @Override
-    public CharSequence getPageTitle(int position) {
-        // Generate title based on item position
-        Drawable image = ContextCompat.getDrawable(context, imgResId[position]);;
-        image.setBounds(0, 0, image.getIntrinsicWidth(), image.getIntrinsicHeight());
-        SpannableString sb = new SpannableString(" " + tabTitles[position]);
-        ImageSpan imageSpan = new ImageSpan(image, ImageSpan.ALIGN_BOTTOM);
-        sb.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        return sb;
-    }*/
 }
